@@ -1,4 +1,41 @@
 ---
-title: "Final Project Abstract: "
-output: pdf_document
+title: "Final Project Abstract"
+course: "ENV710 Lab 3"
+author: "Cara Kuuskvere, Jenn McNeill, and Emma Kaufman"
+date: "2024-02-26"
+output:
+  word_document: default
+  pdf_document: default
 ---
+```{r}
+library(readr)
+```
+
+```{r}
+EPAair_O3_PM25_NC1819_Processed <- read_csv("./Data/Processed_KEY/EPAair_O3_PM25_NC1819_Processed.csv")
+EPAair_O3_PM25_NC1819_Processed_df <- as.data.frame(EPAair_O3_PM25_NC1819_Processed)
+head(EPAair_O3_PM25_NC1819_Processed_df)
+```
+
+
+## 1. State your research question(s) and provide 1-2 paragraphs of background information needed to understand the question or issues. 
+
+We are interested in understanding the relationship between different air pollutant concentrations and air quality in North Carolina in 2018 and 2019. We are specifically interested in concentrations of ozone and PM2.5. We plan to examine the following questions in our report:
+
+- Are Ozone and PM2.5 concentrations correlated?
+- Is Mean AQI correlated with Ozone and PM2.5
+- How correlated are PM2.5 and Ozone concentrations with longitude across North Carolina? 
+
+Ozone and PM2.5 are two of six major air pollutants with standards set by the EPA to protect human health and welfare [1]. When concentrations of these pollutants are too high in ambient air, they can cause serious health and environmental problems [1]. Some common sources of these pollutants are coal-fired power plants, cars, and industrial manufacturers. We are interested in examining these pollutant concentrations throughout North Carolina to see if a disproportionate region of the state is at higher risk for health conditions due to air pollutants PM2.5 and Ozone. We are also interested in whether or not these two pollutant concentrations are correlated. 
+
+
+## 2. Explain why this question is relevant and interesting to env. Science, management, or policy in 1 paragraph
+
+## 3. Describe your data, including the dependent variable(s) and independent variables in the dataset. What is your unit of analysis (e.g., cities, nations, corporations, individuals, plots of land, rivers, etc.)? What type of data are your dependent variables (categorical, nominal, continuous)? List the data source (website, faculty project, etc.).
+
+## 4. With the understanding that we haven’t yet discussed the multivariate statistics and models that you will use to analyze your data, if you do have an idea of the statistical tools/tests you might use (e.g., ANOVA, multiple linear regression, and generalized linear models) briefly discuss them. If not, skip this part.
+
+## 5. State any concerns you have about completing the project or specific information or skills you might need that are not listed on the syllabus.
+
+## References
+1. https://www.deq.nc.gov/about/divisions/air-quality/air-quality-monitoring
