@@ -11,7 +11,7 @@ output:
 library(readr)
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 EPAair_O3_PM25_NC1819_Processed <- read_csv("./Data/Processed_KEY/EPAair_O3_PM25_NC1819_Processed.csv")
 EPAair_O3_PM25_NC1819_Processed_df <- as.data.frame(EPAair_O3_PM25_NC1819_Processed)
 head(EPAair_O3_PM25_NC1819_Processed_df)
