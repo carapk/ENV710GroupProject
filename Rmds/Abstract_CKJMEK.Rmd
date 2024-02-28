@@ -39,7 +39,11 @@ Our data comes from the EPA. It is a data set that provides daily data at 10 dif
 
 ## 4. With the understanding that we haven’t yet discussed the multivariate statistics and models that you will use to analyze your data, if you do have an idea of the statistical tools/tests you might use (e.g., ANOVA, multiple linear regression, and generalized linear models) briefly discuss them. If not, skip this part.
 
+We will conduct hypothesis testing to examine whether our variables of interest are correlated with other variables in our data set. Hypothesis testing will be conducted using  several potential tools such as ANOVA and TukeyHSD testing. This investigation aims to shed light on the behavior of air pollutants around the state of North Carolina. Beyond hypothesis testing for correlation between variables, we may also be able to learn more about potential correlations between the variables studied through linear modeling. 
+
 ## 5. State any concerns you have about completing the project or specific information or skills you might need that are not listed on the syllabus.
+
+Our group looks forward to learning more of the skills required throughout the course to successful complete our analysis. We aim to continue to refine our R skills through both coursework and outside research and learning as needed. 
 
 ## References
 1. https://www.deq.nc.gov/about/divisions/air-quality/air-quality-monitoring
