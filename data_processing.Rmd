@@ -3,9 +3,49 @@ title: "data_processing"
 author: "Jenn McNeill"
 date: "2024-04-05"
 output: pdf_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r}
+
+library(tidyverse)
+library(moments)
+library(dplyr)
+library(ggplot2)
+library(latex2exp)
+getwd()
+
+```
+
+```{r}
+
+air <- read.csv(file="./Data/Processed_KEY/EPAair_O3_PM25_NC1819_Processed.csv", header=TRUE, stringsAsFactors=TRUE)
+
+```
+
+```{r}
+
+air_processed <- air %>%
+  arrange(Date) %>%
+  arrange(Site.Name) %>%
+  select(Date, Site.Name, COUNTY, mean_Lat, mean_Lng, PM2.5, Ozone)
+  
+```
+
+```{r}
+
+fit_1 <- lm(formula = PM2.5 ~ 1, data = air_processed)
+summary(fit_1)
+
+fit_2 <- lm(formula = PM2.5 ~ Ozone, data = air_processed)
+summary(fit_2)
+
+fit_3 <- lm(formula = PM2.5 ~ mean_Lat, data = air_processed)
+summary(fit_3)
+
+fit_4 <- lm(formula = PM2.5 ~ mean_Lng, data = air_processed)
+summary(fit_4)
 
 ```
 
