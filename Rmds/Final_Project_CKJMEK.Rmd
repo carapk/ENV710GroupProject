@@ -1,0 +1,91 @@
+---
+title: "ENV 710 Final Project"
+author: "Emma Kaufman, Cara Kuuskvere, Jenn McNeill"
+date: "2024-04-10"
+output: pdf_document
+---
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+```
+
+
+```{r}
+enzymes <- read_csv("Data/Raw/BBWM20162017enzymesopen.csv", 
+    col_types = cols(Year = col_factor(levels = c("2016", 
+        "2017")), Watershed = col_factor(levels = c("WB", 
+        "EB")), Treatment = col_factor(levels = c("N", 
+        "Reference")), Mycorrhizae = col_factor(levels = c("arbuscular", 
+        "ectomycorrhizal")), SoilFraction = col_factor(levels = c("OrganicHorizon", 
+        "Rhizosphere", "MineralBulk"))))
+```
+
+## AP concentration for old and new-growth forests with a binary indicator variable. 
+
+```{r}
+fit1 <- lm(AP ~ Year, data= enzymes)
+summary(fit1)
+
+AP_by_year <- ggplot(enzymes, aes(x=Year, y= AP, color= Year))+
+   geom_point() +
+   geom_hline(data = subset(enzymes, Year == "2016"), 
+              aes(yintercept = fit1$coefficients[1], color = Year)) +
+   geom_hline(data = subset(enzymes, Year == "2017"), 
+              aes(yintercept = fit1$coefficients[1] + fit1$coefficients[2], color = Year))+
+   labs(y= "What is this?",
+        title= "Change in AP with N and without N")
+
+AP_by_year
+```
+```{r}
+fit1b <- lm(BG ~ Year, data= enzymes)
+summary(fit1b)
+
+BG_by_year <- ggplot(enzymes, aes(x=Year, y= BG, color= Year))+
+   geom_point() +
+   geom_hline(data = subset(enzymes, Year == "2016"), 
+              aes(yintercept = fit1b$coefficients[1], color = Year)) +
+   geom_hline(data = subset(enzymes, Year == "2017"), 
+              aes(yintercept = fit1b$coefficients[1] + fit1b$coefficients[2], color = Year))+
+   labs(y= "What is this?",
+        title= "Change in BG with N and without N")
+
+BG_by_year
+```
+```{r}
+fit1c <- lm(NAG ~ Year, data= enzymes)
+summary(fit1c)
+
+NAG_by_year <- ggplot(enzymes, aes(x=Year, y= NAG, color= Year))+
+   geom_point() +
+   geom_hline(data = subset(enzymes, Year == "2016"), 
+              aes(yintercept = fit1c$coefficients[1], color = Year)) +
+   geom_hline(data = subset(enzymes, Year == "2017"), 
+              aes(yintercept = fit1c$coefficients[1] + fit1c$coefficients[2], color = Year))+
+   labs(y= "What is this?",
+        title= "Change in BG with N and without N")
+
+NAG_by_year
+```
+
+## Explore how AP varies by soil fraction 
+```{r}
+#ECM trees store more carbon than AM trees, as N deposition increases
+
+fit2 <- lm(BG ~ Mycorrhizae + Year, data= enzymes)
+
+ECMvAM_Carbon <- ggplot(enzymes, aes(y= BG, x= Mycorrhizae, color= Year))+
+   geom_point()
+   # geom_hline(data = subset(enzymes, Year == "2016"), 
+   #            aes(yintercept = fit1c$coefficients[1], color = Year)) +
+   # geom_hline(data = subset(enzymes, Year == "2017"), 
+   #            aes(yintercept = fit1c$coefficients[1] + fit1c$coefficients[2], color = Year))+
+   # labs(y= "What is this?",
+   #      title= "Change in BG with N and without N")
+
+ECMvAM_Carbon
+
+```
