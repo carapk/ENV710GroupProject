@@ -1,0 +1,145 @@
+﻿Year,Watershed ,Treatment ,Mycorrhizae ,Plot ,SoilFraction ,AP,BG,NAG
+2016,WB,N,arbuscular,1,OrganicHorizon,4.596941123,2.960197705,3.030818266
+2016,WB,N,arbuscular,2,OrganicHorizon,3.585503581,2.302317348,1.091525126
+2016,WB,N,arbuscular,3,OrganicHorizon,2.768059269,2.773973243,1.412966473
+2016,WB,N,arbuscular,4,OrganicHorizon,5.131379781,2.871866163,1.311161685
+2016,WB,N,arbuscular,5,OrganicHorizon,6.67652212,2.192982978,0.377879119
+2016,WB,N,arbuscular,6,OrganicHorizon,5.059614891,2.745309373,2.78442919
+2016,WB,N,ectomycorrhizal,7,OrganicHorizon,4.529754117,3.003370596,2.380675551
+2016,WB,N,ectomycorrhizal,8,OrganicHorizon,2.670808587,2.283298901,1.104739048
+2016,WB,N,ectomycorrhizal,9,OrganicHorizon,4.723814972,3.440835494,2.400089019
+2016,WB,N,ectomycorrhizal,10,OrganicHorizon,3.963965927,3.222747825,2.224086042
+2016,WB,N,ectomycorrhizal,11,OrganicHorizon,4.735982741,3.371863679,2.046240384
+2016,WB,N,ectomycorrhizal,12,OrganicHorizon,3.394552039,2.904796504,2.303504219
+2016,WB,N,arbuscular,1,Rhizosphere,0.694802313,0.380020017,0.06752098
+2016,WB,N,arbuscular,2,Rhizosphere,0.937258157,0.54895742,0.132072027
+2016,WB,N,arbuscular,3,Rhizosphere,0.799204964,0.364536561,0.064076159
+2016,WB,N,arbuscular,4,Rhizosphere,0.691396315,0.597690377,0.080604488
+2016,WB,N,arbuscular,5,Rhizosphere,0.903832785,0.493046359,0.123975215
+2016,WB,N,arbuscular,6,Rhizosphere,1.27572795,0.674443459,0.119381796
+2016,WB,N,ectomycorrhizal,7,Rhizosphere,0.759482434,0.369408031,0.077363854
+2016,WB,N,ectomycorrhizal,8,Rhizosphere,0.531959058,0.50081615,0.065829584
+2016,WB,N,ectomycorrhizal,9,Rhizosphere,0.756373065,0.568630281,0.099629262
+2016,WB,N,ectomycorrhizal,10,Rhizosphere,0.713744112,0.421074418,0.084493097
+2016,WB,N,ectomycorrhizal,11,Rhizosphere,0.863889647,0.790962452,0.203195411
+2016,WB,N,ectomycorrhizal,12,Rhizosphere,0.723672568,0.539391605,0.167859874
+2016,WB,N,arbuscular,1,MineralBulk,0.680881514,0.357441442,0.077197001
+2016,WB,N,arbuscular,2,MineralBulk,0.772463558,0.348461,0.05810652
+2016,WB,N,arbuscular,3,MineralBulk,0.577372605,0.483195334,0.092182335
+2016,WB,N,arbuscular,4,MineralBulk,0.565474171,0.457556923,0.09353387
+2016,WB,N,arbuscular,5,MineralBulk,0.855280531,0.575100542,0.065020991
+2016,WB,N,arbuscular,6,MineralBulk,0.704641392,0.310832666,0.066363681
+2016,WB,N,ectomycorrhizal,7,MineralBulk,0.489240341,0.234743639,0.078108777
+2016,WB,N,ectomycorrhizal,8,MineralBulk,0.484545715,0.418307511,0.0754102
+2016,WB,N,ectomycorrhizal,9,MineralBulk,0.671564205,0.518829867,0.078892937
+2016,WB,N,ectomycorrhizal,10,MineralBulk,0.680018957,0.312203564,0.097561222
+2016,WB,N,ectomycorrhizal,11,MineralBulk,0.579063088,0.290637262,0.081620315
+2016,WB,N,ectomycorrhizal,12,MineralBulk,0.720887948,0.363434674,0.10091994
+2016,EB,Reference ,arbuscular,13,OrganicHorizon,6.574372527,1.189069783,1.808650117
+2016,EB,Reference ,arbuscular,14,OrganicHorizon,4.258114033,1.076796055,0.828850996
+2016,EB,Reference ,arbuscular,15,OrganicHorizon,4.782126797,1.232068265,1.152763791
+2016,EB,Reference ,arbuscular,16,OrganicHorizon,5.376504933,1.267910322,0.949747095
+2016,EB,Reference ,arbuscular,17,OrganicHorizon,5.193574981,2.116635049,1.816067822
+2016,EB,Reference ,arbuscular,18,OrganicHorizon,5.819319651,1.200883362,1.434510488
+2016,EB,Reference ,ectomycorrhizal,19,OrganicHorizon,5.555577505,1.044691014,0.77656129
+2016,EB,Reference ,ectomycorrhizal,20,OrganicHorizon,3.609353965,0.822288777,0.478653756
+2016,EB,Reference ,ectomycorrhizal,21,OrganicHorizon,4.655416057,1.258629095,0.523879075
+2016,EB,Reference ,ectomycorrhizal,22,OrganicHorizon,3.866672545,0.762976996,1.432518875
+2016,EB,Reference ,ectomycorrhizal,23,OrganicHorizon,4.502053636,1.093423423,0.944860406
+2016,EB,Reference ,ectomycorrhizal,24,OrganicHorizon,3.27259147,1.265276196,0.972325694
+2016,EB,Reference ,arbuscular,13,Rhizosphere,1.320616984,0.370148957,0.407631233
+2016,EB,Reference ,arbuscular,14,Rhizosphere,0.951412102,0.315304789,0.135234452
+2016,EB,Reference ,arbuscular,15,Rhizosphere,1.133988633,0.276983686,0.689768846
+2016,EB,Reference ,arbuscular,16,Rhizosphere,0.959038638,0.245635207,0.082867159
+2016,EB,Reference ,arbuscular,17,Rhizosphere,0.780991588,0.141958372,0.059118577
+2016,EB,Reference ,arbuscular,18,Rhizosphere,1.71191827,0.503686765,0.247816322
+2016,EB,Reference ,ectomycorrhizal,19,Rhizosphere,1.172713136,0.299447126,0.421340678
+2016,EB,Reference ,ectomycorrhizal,20,Rhizosphere,1.767373323,0.163693666,0.19459156
+2016,EB,Reference ,ectomycorrhizal,21,Rhizosphere,0.880736021,0.13263347,0.166594012
+2016,EB,Reference ,ectomycorrhizal,22,Rhizosphere,0.853683889,0.187074202,0.123508578
+2016,EB,Reference ,ectomycorrhizal,23,Rhizosphere,1.639219381,0.409507548,0.1354444
+2016,EB,Reference ,ectomycorrhizal,24,Rhizosphere,1.540724286,0.414757428,0.102193574
+2016,EB,Reference ,arbuscular,13,MineralBulk,0.81394454,0.228885054,0.408308877
+2016,EB,Reference ,arbuscular,14,MineralBulk,0.746658117,0.206813847,0.110723843
+2016,EB,Reference ,arbuscular,15,MineralBulk,0.949305701,0.185761797,0.277351885
+2016,EB,Reference ,arbuscular,16,MineralBulk,0.869964854,0.195213482,0.070464316
+2016,EB,Reference ,arbuscular,17,MineralBulk,0.844455542,0.208176785,0.075704521
+2016,EB,Reference ,arbuscular,18,MineralBulk,1.497479647,0.423348416,0.207097908
+2016,EB,Reference ,ectomycorrhizal,19,MineralBulk,0.888510243,0.225447784,0.203712302
+2016,EB,Reference ,ectomycorrhizal,20,MineralBulk,1.401297654,0.18146952,0.119581829
+2016,EB,Reference ,ectomycorrhizal,21,MineralBulk,0.850787148,0.178434536,0.087545431
+2016,EB,Reference ,ectomycorrhizal,22,MineralBulk,0.738035332,0.185748392,0.069595405
+2016,EB,Reference ,ectomycorrhizal,23,MineralBulk,1.794472354,0.408655475,0.188131796
+2016,EB,Reference ,ectomycorrhizal,24,MineralBulk,1.901205617,0.514204597,0.182518234
+2017,WB,N,arbuscular,1,OrganicHorizon,3.241723822,0.736307298,0.82033447
+2017,WB,N,arbuscular,2,OrganicHorizon,2.560353206,0.782622582,0.832491793
+2017,WB,N,arbuscular,3,OrganicHorizon,2.037627521,1.080624659,0.689002227
+2017,WB,N,arbuscular,4,OrganicHorizon,1.917222762,0.908376195,0.562859724
+2017,WB,N,arbuscular,5,OrganicHorizon,2.266801371,0.745206071,0.268893828
+2017,WB,N,arbuscular,6,OrganicHorizon,2.607817688,1.081962308,0.540406007
+2017,WB,N,ectomycorrhizal,7,OrganicHorizon,1.629199745,0.720493854,0.518948311
+2017,WB,N,ectomycorrhizal,8,OrganicHorizon,2.617036174,1.137742982,1.046709651
+2017,WB,N,ectomycorrhizal,9,OrganicHorizon,2.408075781,0.846257844,0.67380442
+2017,WB,N,ectomycorrhizal,10,OrganicHorizon,1.907080146,0.747915789,0.544044776
+2017,WB,N,ectomycorrhizal,11,OrganicHorizon,2.481277111,1.224758589,0.687723409
+2017,WB,N,ectomycorrhizal,12,OrganicHorizon,1.35759894,0.628847614,0.459035948
+2017,WB,N,arbuscular,1,Rhizosphere,0.623119122,0.285273216,0.070652267
+2017,WB,N,arbuscular,2,Rhizosphere,0.572016394,0.228927455,0.060375718
+2017,WB,N,arbuscular,3,Rhizosphere,0.505976929,0.161503778,0.054053137
+2017,WB,N,arbuscular,4,Rhizosphere,0.729783745,0.332334133,0.080322664
+2017,WB,N,arbuscular,5,Rhizosphere,0.992524175,0.392608963,0.078729044
+2017,WB,N,arbuscular,6,Rhizosphere,0.61677674,0.30256774,0.070271355
+2017,WB,N,ectomycorrhizal,7,Rhizosphere,0.547178778,0.246831538,0.058987002
+2017,WB,N,ectomycorrhizal,8,Rhizosphere,0.520106846,0.171635054,0.064571949
+2017,WB,N,ectomycorrhizal,9,Rhizosphere,0.704376962,0.325683587,0.13838636
+2017,WB,N,ectomycorrhizal,10,Rhizosphere,0.76280041,0.204731159,0.07743204
+2017,WB,N,ectomycorrhizal,11,Rhizosphere,1.103228718,0.387944053,0.28116669
+2017,WB,N,ectomycorrhizal,12,Rhizosphere,0.796606934,0.269420377,0.098551932
+2017,WB,N,arbuscular,1,MineralBulk,0.521573331,0.272235451,0.094537472
+2017,WB,N,arbuscular,2,MineralBulk,0.507431562,0.213470624,0.080052182
+2017,WB,N,arbuscular,3,MineralBulk,0.471681114,0.240942155,0.096677701
+2017,WB,N,arbuscular,4,MineralBulk,0.743708544,0.376444953,0.109043056
+2017,WB,N,arbuscular,5,MineralBulk,0.884560299,0.350982312,0.11480088
+2017,WB,N,arbuscular,6,MineralBulk,0.567113799,0.316015333,0.094390068
+2017,WB,N,ectomycorrhizal,7,MineralBulk,0.598077532,0.228860038,0.093707605
+2017,WB,N,ectomycorrhizal,8,MineralBulk,0.397348007,0.163835018,0.081284171
+2017,WB,N,ectomycorrhizal,9,MineralBulk,0.556421972,0.314628592,0.096076691
+2017,WB,N,ectomycorrhizal,10,MineralBulk,0.472187306,0.298409984,0.062375374
+2017,WB,N,ectomycorrhizal,11,MineralBulk,0.53327446,0.280617791,0.237040272
+2017,WB,N,ectomycorrhizal,12,MineralBulk,0.688663937,0.342480408,0.121549684
+2017,EB,Reference ,arbuscular,13,OrganicHorizon,2.883013314,1.150012853,2.313955789
+2017,EB,Reference ,arbuscular,14,OrganicHorizon,1.317487533,0.670521268,0.587467374
+2017,EB,Reference ,arbuscular,15,OrganicHorizon,1.832942385,0.847199014,0.531520447
+2017,EB,Reference ,arbuscular,16,OrganicHorizon,4.032604,1.109584516,1.004003159
+2017,EB,Reference ,arbuscular,17,OrganicHorizon,2.45606719,1.137103752,1.009059265
+2017,EB,Reference ,arbuscular,18,OrganicHorizon,4.113682186,1.40394127,0.719344403
+2017,EB,Reference ,ectomycorrhizal,19,OrganicHorizon,2.423489562,0.94392897,0.878737128
+2017,EB,Reference ,ectomycorrhizal,20,OrganicHorizon,1.323275955,0.477842377,0.429532159
+2017,EB,Reference ,ectomycorrhizal,21,OrganicHorizon,2.898895024,0.99114926,0.481632576
+2017,EB,Reference ,ectomycorrhizal,22,OrganicHorizon,3.759287962,0,0
+2017,EB,Reference ,ectomycorrhizal,23,OrganicHorizon,3.368163902,1.42347912,1.432326594
+2017,EB,Reference ,ectomycorrhizal,24,OrganicHorizon,3.823114378,1.262751697,0.928321937
+2017,EB,Reference ,arbuscular,13,Rhizosphere,1.041564147,0.307073258,0.747951714
+2017,EB,Reference ,arbuscular,14,Rhizosphere,0.671375055,0.221358058,0.074776601
+2017,EB,Reference ,arbuscular,15,Rhizosphere,1.17213696,0.278093539,0.070840109
+2017,EB,Reference ,arbuscular,16,Rhizosphere,1.686753362,0.501882222,0.399862164
+2017,EB,Reference ,arbuscular,17,Rhizosphere,1.255159432,0.45647199,0.165133152
+2017,EB,Reference ,arbuscular,18,Rhizosphere,1.416633309,0.505912217,0.477957339
+2017,EB,Reference ,ectomycorrhizal,19,Rhizosphere,1.052139461,0.289150994,0.210098607
+2017,EB,Reference ,ectomycorrhizal,20,Rhizosphere,0.681564045,0.166564432,0.105244171
+2017,EB,Reference ,ectomycorrhizal,21,Rhizosphere,1.170361537,0.294296343,0.093376979
+2017,EB,Reference ,ectomycorrhizal,22,Rhizosphere,0.761271542,0.322147479,0.32279883
+2017,EB,Reference ,ectomycorrhizal,23,Rhizosphere,1.08093278,0.548009873,0.782708962
+2017,EB,Reference ,ectomycorrhizal,24,Rhizosphere,1.360210367,0.719919611,0.309661936
+2017,EB,Reference ,arbuscular,13,MineralBulk,0.907950425,0.390557188,0.293039263
+2017,EB,Reference ,arbuscular,14,MineralBulk,0.894835473,0.317335964,0.126273784
+2017,EB,Reference ,arbuscular,15,MineralBulk,1.104359716,0.182243787,0.119216764
+2017,EB,Reference ,arbuscular,16,MineralBulk,1.76086848,0.538941246,0.507536365
+2017,EB,Reference ,arbuscular,17,MineralBulk,0.99189763,0.300229729,0.151575505
+2017,EB,Reference ,arbuscular,18,MineralBulk,1.322906505,0.372803698,0.306011932
+2017,EB,Reference ,ectomycorrhizal,19,MineralBulk,1.038041354,0.318171189,0.237716181
+2017,EB,Reference ,ectomycorrhizal,20,MineralBulk,1.056170757,0.267875976,0.172847969
+2017,EB,Reference ,ectomycorrhizal,21,MineralBulk,1.384143396,0.37690909,0.25981853
+2017,EB,Reference ,ectomycorrhizal,22,MineralBulk,1.240050674,0.3749877,0.241445152
+2017,EB,Reference ,ectomycorrhizal,23,MineralBulk,1.401791972,0.4162211,0.230631198
+2017,EB,Reference ,ectomycorrhizal,24,MineralBulk,0.943491739,0.293997374,0.155913106
