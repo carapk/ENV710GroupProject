@@ -1,0 +1,59 @@
+---
+title: "Final Project Abstract"
+course: "ENV710 Lab 3"
+author: "Cara Kuuskvere, Jenn McNeill, and Emma Kaufman"
+date: "2024-02-26"
+output:
+  word_document: default
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r eval=FALSE, include=FALSE}
+library(readr)
+```
+
+```{r eval=FALSE, include=FALSE}
+
+lakes_raw <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",stringsAsFactors = TRUE)
+
+head(lakes_raw)
+
+```
+
+## 1. State your research question(s) and provide 1-2 paragraphs of background information needed to understand the question or issues.
+
+We are interested in understanding the relationship between water quality parameters and a variety of temporal and spatial factors in freshwater bodies in Wisconsin. We are specifically interested in concentrations of total phosphorus and total nitrogen. We plan to examine the following questions in our report:
+
+-   How does total phosphorus/total nitrogen vary between lakes?
+-   How does total phosphorus/total nitrogen vary between years?
+-   How does total phosphorus/total nitrogen vary between months?
+-   How does total phosphorus/total nitrogen vary depending on the depth of the lake?
+-   How strongly are total phosphorus/total nitrogen correlated with other water quality parameters such as nh34, no23, and po4?
+
+We have identified some important background information to understand these research questions. Firstly, it is essential to understand that total phosphorus and total nitrogen are two freshwater water quality parameters that are aggregate parameters. 
+
+Phosphorus enters a lake from rainfall, incoming streams, overland runoff, groundwater, and decomposition of organic matter and the erosion of soils. Phosphorus is contributed to a lake by human activity in the watershed, direct discharge of wastes, runoff from agriculture, or poorly maintained septic systems. Most of the phosphorus in lakes occurs in two forms: dissolved phosphorus and particulate phosphorus. The determination of total phosphorus is a measure of all forms of phosphorus potentially available to algae [1]. 
+
+Nitrogen is an essential plant nutrient found in fertilizers, human and animal wastes, yard waste, and the air. About 80% of the atmosphere is nitrogen gas. Nitrogen gas diffuses into water where it can be “fixed” (converted) by blue-green algae to ammonia for algal use. Nitrogen can also enter lakes and streams as inorganic nitrogen and ammonia. Because nitrogen can enter aquatic systems in many forms, there is an abundant supply of available nitrogen in these systems. Total nitrogen is a measure of three common forms of nitrogen: nitrate (NO3-), ammonia (NH4+), and organic nitrogen [1].
+
+## 2. Explain why this question is relevant and interesting to env. Science, management, or policy in 1 paragraph
+
+Total phosphorus and total nitrogen found in lakes come from agricultural runoff and wastewater discharge and contribute to issues such as algal blooms and diminished water clarity. Our research questions are relevant to environmental management because analyzing the spatial and temporal disparities in these nutrient concentrations provides valuable insights into the origins of pollution affecting these aquatic environments. Moreover, studying the fluctuation of TP and TN levels over different years and seasons helps to identify recurring patterns and uncover the influence of climatic variations and human activities on nutrient dynamics. Varying lake depth may affect nutrient cycling mechanisms, sediment accumulation rates, and water mixing dynamics and thus cause variations in TP and TN concentrations. By gaining a comprehensive understanding of these dynamics through linear modeling, effective management strategies can be developed to mitigate nutrient pollution and preserve the ecological integrity of Wisconsin's freshwater ecosystems.
+
+## 3. Describe your data, including the dependent variable(s) and independent variables in the dataset. What is your unit of analysis (e.g., cities, nations, corporations, individuals, plots of land, rivers, etc.)? What type of data are your dependent variables (categorical, nominal, continuous)? List the data source (website, faculty project, etc.).
+
+??What is our data source?? It is a data set that provides daily nutrient level data at 26 different lakes across Wisconsin for a time period of 25 years. The variables for each lake include the lake depth, total nitrogen, total phosphorus, nh34, no23, and po4. All data are continuous and independent of one another with the exception that nh34 and no23 contribute to total nitrogen and po4 contributes to total phosphorus. 
+
+## 4. With the understanding that we haven't yet discussed the multivariate statistics and models that you will use to analyze your data, if you do have an idea of the statistical tools/tests you might use (e.g., ANOVA, multiple linear regression, and generalized linear models) briefly discuss them. If not, skip this part.
+
+We will conduct hypothesis testing to examine whether our variables of interest are correlated with other variables in our data set. Hypothesis testing will be conducted using several potential tools such as ANOVA and TukeyHSD testing. This investigation aims to shed light on the behavior of water pollutants in Wisconsin freshwater bodies. Beyond hypothesis testing for correlation between variables, we may also be able to learn more about potential correlations between the variables studied through linear modeling.
+
+## 5. State any concerns you have about completing the project or specific information or skills you might need that are not listed on the syllabus.
+
+Our group looks forward to learning more of the skills required throughout the course to successfully complete our analysis. We aim to continue to refine our R skills through both coursework and outside research and learning as needed.
+
+## References
+
+1.  <https://clp.indiana.edu/volunteer-data/phosphorus-chlorophyll.html#:~:text=Total%20nitrogen%20(TN)%20is%20the,managers%20to%20determine%20nutrient%20enrichment.>

@@ -3,38 +3,167 @@ title: "ENV 710 Final Project"
 author: "Emma Kaufman, Cara Kuuskvere, Jenn McNeill"
 date: "2024-04-10"
 output: pdf_document
+editor_options: 
+  chunk_output_type: console
 ---
-```{r}
+```{r load packages, include=FALSE}
+
 library(readr)
 library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(tidyverse)
 library(lubridate)
+library(latex2exp)
+library(lubridate)
+
 ```
 
-```{r}
-Lake <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",stringsAsFactors = TRUE) 
+```{r import and wrangle data}
 
-Lake$sampledate <- mdy(Lake$sampledate)
+lakes_raw <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",stringsAsFactors = TRUE) 
+
+lakes_raw$sampledate <- mdy(lakes_raw$sampledate)
+
+lakes_processed <- lakes_raw %>%
+  select(lakename, sampledate, depth, tn_ug, tp_ug, nh34, no23, po4) %>%
+  na.omit() %>%
+  filter(lakename %in% c("Paul Lake", "West Long Lake", "Peter Lake", "East Long Lake")) %>%
+  filter(year(sampledate) >= 1994 & year(sampledate) <= 1999) %>%
+  mutate(year = factor(year(sampledate)),
+         month = factor(month(sampledate)),
+         deep = factor(ifelse(depth > 6, 1, 0))) %>%
+  filter(month %in% c(5,6,7,8))
+
+
 #create a subset of the data
-lake_chem_subset <- Lake %>% 
-  mutate(month = month(sampledate)) %>%
-  filter(month ==6 & 7 & 8) %>% 
-  select(lakename:daynum, depth:temperature_C) %>% 
-  na.omit()
+# lake_chem_subset <- Lake %>% 
+#   mutate(month = month(sampledate)) %>%
+#   filter(month ==6 & 7 & 8) %>% 
+#   select(lakename:daynum, depth:temperature_C) %>% 
+#   na.omit()
+
 ```
 
+```{r tp by year with po4}
 
+fit_1 <- lm(formula = tp_ug ~ year + po4, data = lakes_processed)
+print(fit_1)
 
+ggplot(lakes_processed, aes(x=po4, y=tp_ug, color=year))+
+  geom_point()+
+  geom_abline(intercept = coef(fit_1)[1], slope = coef(fit_1)[7], 
+              color = "orchid3")+
+  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[2], slope = coef(fit_1)[7], 
+              color = "cyan4")+
+  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[3], slope = coef(fit_1)[7], 
+              color = "slateblue")+
+  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[4], slope = coef(fit_1)[7], 
+              color = "tomato3")+
+  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[5], slope = coef(fit_1)[7], 
+              color = "skyblue1")+
+  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[6], slope = coef(fit_1)[7], 
+              color = "limegreen")+
+  scale_color_manual(values = c("1994" = "orchid3", 
+                                "1995" = "cyan4",
+                                "1996" = "slateblue",
+                                "1997" = "tomato3",
+                                "1998" = "skyblue1",
+                                "1999" = "limegreen"))+
+  scale_x_continuous(breaks = seq(0, 200, by = 20))+
+  scale_y_continuous(breaks = seq(0, 300, by = 50))+
+  ylab("total phosphorus (micrograms)")+
+  xlab("phosphate (micrograms)")+
+  ggtitle("Change in Total Phosphorus in Samples Taken 
+in 1994, 1995, 1996, 1997, 1998, and 1999")+
+  theme_light()+
+  theme(legend.position="bottom")
 
+```
 
+```{r tp by month with po4}
 
+fit_2 <- lm(formula = tp_ug ~ month + po4, data = lakes_processed)
+print(fit_2)
 
+ggplot(lakes_processed, aes(x=po4, y=tp_ug, color=month))+
+  geom_point()+
+  geom_abline(intercept = coef(fit_2)[1], slope = coef(fit_2)[5], 
+              color = "orchid3")+
+  geom_abline(intercept = coef(fit_2)[1] + coef(fit_2)[2], slope = coef(fit_2)[5], 
+              color = "cyan4")+
+  geom_abline(intercept = coef(fit_2)[1] + coef(fit_2)[3], slope = coef(fit_2)[5], 
+              color = "slateblue")+
+  geom_abline(intercept = coef(fit_2)[1] + coef(fit_2)[4], slope = coef(fit_2)[5], 
+              color = "tomato3")+
+  scale_color_manual(values = c("5" = "orchid3", 
+                                "6" = "cyan4",
+                                "7" = "slateblue",
+                                "8" = "tomato3"))+
+  scale_x_continuous(breaks = seq(0, 200, by = 20))+
+  scale_y_continuous(breaks = seq(0, 300, by = 50))+
+  ylab("total phosphorus (micrograms)")+
+  xlab("phosphate (micrograms)")+
+  ggtitle("Change in Total Phosphorus in Samples Taken 
+in May, June, July, and August")+
+  theme_light()+
+  theme(legend.position="bottom")
 
+```
 
+```{r tp by deepness binary indicator with po4}
 
+fit_3 <- lm(formula = tp_ug ~ deep + po4, data = lakes_processed)
+print(fit_3)
 
+ggplot(lakes_processed, aes(x=po4, y=tp_ug, color=deep))+
+  geom_point()+
+  geom_abline(intercept = coef(fit_3)[1], slope = coef(fit_3)[3], 
+              color = "orchid3")+
+  geom_abline(intercept = coef(fit_3)[1] + coef(fit_2)[2], slope = coef(fit_3)[3], 
+              color = "cyan4")+
+  scale_color_manual(values = c("0" = "orchid3", 
+                                "1" = "cyan4"))+
+  scale_x_continuous(breaks = seq(0, 200, by = 20))+
+  scale_y_continuous(breaks = seq(0, 300, by = 50))+
+  ylab("total phosphorus (micrograms)")+
+  xlab("phosphate (micrograms)")+
+  ggtitle("Change in Total Phosphorus in Samples Taken 
+Above and Below 6 ft Water Depth")+
+  theme_light()+
+  theme(legend.position="bottom")
+
+```
+
+```{r tp by lake with po4}
+
+fit_4 <- lm(formula = tp_ug ~ lakename + po4, data = lakes_processed)
+print(fit_4)
+
+ggplot(lakes_processed, aes(x=po4, y=tp_ug, color=lakename))+
+  geom_point()+
+  geom_abline(intercept = coef(fit_4)[1], slope = coef(fit_4)[5], 
+              color = "orchid3")+
+  geom_abline(intercept = coef(fit_4)[1] + coef(fit_4)[2], slope = coef(fit_4)[5], 
+              color = "cyan4")+
+  geom_abline(intercept = coef(fit_4)[1] + coef(fit_4)[3], slope = coef(fit_4)[5], 
+              color = "slateblue")+
+  geom_abline(intercept = coef(fit_4)[1] + coef(fit_4)[4], slope = coef(fit_4)[5], 
+              color = "tomato3")+
+  scale_color_manual(values = c("East Long Lake" = "orchid3", 
+                                "Paul Lake" = "cyan4",
+                                "Peter Lake" = "slateblue",
+                                "West Long Lake" = "tomato3"))+
+  scale_x_continuous(breaks = seq(0, 200, by = 20))+
+  scale_y_continuous(breaks = seq(0, 300, by = 50))+
+  ylab("total phosphorus (micrograms)")+
+  xlab("phosphate (micrograms)")+
+  ggtitle("Change in Total Phosphorus in Samples Taken 
+at East Long Lake, Paul Lake, Peter Lake, and West Long Lake")+
+  theme_light()+
+  theme(legend.position="bottom")
+
+```
 
 
 
