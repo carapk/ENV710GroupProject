@@ -22,6 +22,7 @@ library(lubridate)
 ```{r import and wrangle data}
 
 lakes_raw <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",stringsAsFactors = TRUE) 
+lakes_new <- read_csv("Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
 
 lakes_raw$sampledate <- mdy(lakes_raw$sampledate)
 
@@ -35,13 +36,22 @@ lakes_processed <- lakes_raw %>%
          deep = factor(ifelse(depth > 6, 1, 0))) %>%
   filter(month %in% c(5,6,7,8))
 
+lake_1994 <- lakes_processed %>% 
+  filter(year %in% c(1994)) %>% 
+  filter(po4<20) %>% 
+  filter(tp_ug<100)
 
-#create a subset of the data
-# lake_chem_subset <- Lake %>% 
-#   mutate(month = month(sampledate)) %>%
-#   filter(month ==6 & 7 & 8) %>% 
-#   select(lakename:daynum, depth:temperature_C) %>% 
-#   na.omit()
+lakes_new$sampledate <- mdy(lakes_new$sampledate)
+
+lakes_chem_processed <- lakes_new %>%
+  select(lakename, sampledate, depth, temperature_C, dissolvedOxygen) %>%
+  na.omit() %>%
+  filter(lakename %in% c("Paul Lake", "West Long Lake", "Peter Lake", "East Long Lake")) %>%
+  filter(year(sampledate) == 1994) %>%
+  mutate(year = factor(year(sampledate)),
+         month = factor(month(sampledate)),
+         deep = factor(ifelse(depth > 6, 1, 0))) %>%
+  filter(month %in% c(5,6,7,8))
 
 ```
 
@@ -72,8 +82,8 @@ ggplot(lakes_processed, aes(x=po4, y=tp_ug, color=year))+
                                 "1999" = "limegreen"))+
   scale_x_continuous(breaks = seq(0, 200, by = 20))+
   scale_y_continuous(breaks = seq(0, 300, by = 50))+
-  ylab("total phosphorus (micrograms)")+
-  xlab("phosphate (micrograms)")+
+  ylab(expression("Total Phosphorus" ~ (µg))) +
+  xlab(expression("Phosphate" ~ (µg))) +
   ggtitle("Change in Total Phosphorus in Samples Taken 
 in 1994, 1995, 1996, 1997, 1998, and 1999")+
   theme_light()+
@@ -83,10 +93,10 @@ in 1994, 1995, 1996, 1997, 1998, and 1999")+
 
 ```{r tp by month with po4}
 
-fit_2 <- lm(formula = tp_ug ~ month + po4, data = lakes_processed)
+fit_2 <- lm(formula = tp_ug ~ month + po4, data = lake_1994)
 print(fit_2)
 
-ggplot(lakes_processed, aes(x=po4, y=tp_ug, color=month))+
+ggplot(lake_1994, aes(x=po4, y=tp_ug, color=month))+
   geom_point()+
   geom_abline(intercept = coef(fit_2)[1], slope = coef(fit_2)[5], 
               color = "orchid3")+
@@ -100,10 +110,10 @@ ggplot(lakes_processed, aes(x=po4, y=tp_ug, color=month))+
                                 "6" = "cyan4",
                                 "7" = "slateblue",
                                 "8" = "tomato3"))+
-  scale_x_continuous(breaks = seq(0, 200, by = 20))+
-  scale_y_continuous(breaks = seq(0, 300, by = 50))+
-  ylab("total phosphorus (micrograms)")+
-  xlab("phosphate (micrograms)")+
+  #scale_x_continuous(breaks = seq(0, 200, by = 20))+
+  #scale_y_continuous(breaks = seq(0, 300, by = 50))+
+  ylab(expression("Total Phosphorus" ~ (µg))) +
+  xlab(expression("Phosphate" ~ (µg))) +
   ggtitle("Change in Total Phosphorus in Samples Taken 
 in May, June, July, and August")+
   theme_light()+
@@ -113,21 +123,21 @@ in May, June, July, and August")+
 
 ```{r tp by deepness binary indicator with po4}
 
-fit_3 <- lm(formula = tp_ug ~ deep + po4, data = lakes_processed)
+fit_3 <- lm(formula = tp_ug ~ deep + po4, data = lake_1994)
 print(fit_3)
 
-ggplot(lakes_processed, aes(x=po4, y=tp_ug, color=deep))+
+ggplot(lake_1994, aes(x=po4, y=tp_ug, color=deep))+
   geom_point()+
   geom_abline(intercept = coef(fit_3)[1], slope = coef(fit_3)[3], 
               color = "orchid3")+
-  geom_abline(intercept = coef(fit_3)[1] + coef(fit_2)[2], slope = coef(fit_3)[3], 
+  geom_abline(intercept = coef(fit_3)[1] + coef(fit_3)[2], slope = coef(fit_3)[3], 
               color = "cyan4")+
   scale_color_manual(values = c("0" = "orchid3", 
                                 "1" = "cyan4"))+
-  scale_x_continuous(breaks = seq(0, 200, by = 20))+
-  scale_y_continuous(breaks = seq(0, 300, by = 50))+
-  ylab("total phosphorus (micrograms)")+
-  xlab("phosphate (micrograms)")+
+  #scale_x_continuous(breaks = seq(0, 20, by = 20))+
+  #scale_y_continuous(breaks = seq(0, 100, by = 50))+
+  ylab(expression("Total Phosphorus" ~ (µg))) +
+  xlab(expression("Phosphate" ~ (µg))) +
   ggtitle("Change in Total Phosphorus in Samples Taken 
 Above and Below 6 ft Water Depth")+
   theme_light()+
@@ -137,10 +147,10 @@ Above and Below 6 ft Water Depth")+
 
 ```{r tp by lake with po4}
 
-fit_4 <- lm(formula = tp_ug ~ lakename + po4, data = lakes_processed)
+fit_4 <- lm(formula = tp_ug ~ lakename + po4, data = lake_1994)
 print(fit_4)
 
-ggplot(lakes_processed, aes(x=po4, y=tp_ug, color=lakename))+
+ggplot(lake_1994, aes(x=po4, y=tp_ug, color=lakename))+
   geom_point()+
   geom_abline(intercept = coef(fit_4)[1], slope = coef(fit_4)[5], 
               color = "orchid3")+
@@ -156,91 +166,11 @@ ggplot(lakes_processed, aes(x=po4, y=tp_ug, color=lakename))+
                                 "West Long Lake" = "tomato3"))+
   scale_x_continuous(breaks = seq(0, 200, by = 20))+
   scale_y_continuous(breaks = seq(0, 300, by = 50))+
-  ylab("total phosphorus (micrograms)")+
-  xlab("phosphate (micrograms)")+
+  ylab(expression("Total Phosphorus" ~ (µg))) +
+  xlab(expression("Phosphate" ~ (µg))) +
   ggtitle("Change in Total Phosphorus in Samples Taken 
 at East Long Lake, Paul Lake, Peter Lake, and West Long Lake")+
   theme_light()+
   theme(legend.position="bottom")
 
 ```
-
-
-
-OLD CODE
-<!-- ```{r} -->
-<!-- enzymes <- read_csv("Data/Raw/BBWM20162017enzymesopen.csv",  -->
-<!--     col_types = cols(Year = col_factor(levels = c("2016",  -->
-<!--         "2017")), Watershed = col_factor(levels = c("WB",  -->
-<!--         "EB")), Treatment = col_factor(levels = c("N",  -->
-<!--         "Reference")), Mycorrhizae = col_factor(levels = c("arbuscular",  -->
-<!--         "ectomycorrhizal")), SoilFraction = col_factor(levels = c("OrganicHorizon",  -->
-<!--         "Rhizosphere", "MineralBulk")))) -->
-<!-- ``` -->
-
-<!-- ## AP concentration for old and new-growth forests with a binary indicator variable.  -->
-
-<!-- ```{r} -->
-<!-- fit1 <- lm(AP ~ Year, data= enzymes) -->
-<!-- summary(fit1) -->
-
-<!-- AP_by_year <- ggplot(enzymes, aes(x=Year, y= AP, color= Year))+ -->
-<!--    geom_point() + -->
-<!--    geom_hline(data = subset(enzymes, Year == "2016"),  -->
-<!--               aes(yintercept = fit1$coefficients[1], color = Year)) + -->
-<!--    geom_hline(data = subset(enzymes, Year == "2017"),  -->
-<!--               aes(yintercept = fit1$coefficients[1] + fit1$coefficients[2], color = Year))+ -->
-<!--    labs(y= "What is this?", -->
-<!--         title= "Change in AP with N and without N") -->
-
-<!-- AP_by_year -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- fit1b <- lm(BG ~ Year, data= enzymes) -->
-<!-- summary(fit1b) -->
-
-<!-- BG_by_year <- ggplot(enzymes, aes(x=Year, y= BG, color= Year))+ -->
-<!--    geom_point() + -->
-<!--    geom_hline(data = subset(enzymes, Year == "2016"),  -->
-<!--               aes(yintercept = fit1b$coefficients[1], color = Year)) + -->
-<!--    geom_hline(data = subset(enzymes, Year == "2017"),  -->
-<!--               aes(yintercept = fit1b$coefficients[1] + fit1b$coefficients[2], color = Year))+ -->
-<!--    labs(y= "What is this?", -->
-<!--         title= "Change in BG with N and without N") -->
-
-<!-- BG_by_year -->
-<!-- ``` -->
-<!-- ```{r} -->
-<!-- fit1c <- lm(NAG ~ Year, data= enzymes) -->
-<!-- summary(fit1c) -->
-
-<!-- NAG_by_year <- ggplot(enzymes, aes(x=Year, y= NAG, color= Year))+ -->
-<!--    geom_point() + -->
-<!--    geom_hline(data = subset(enzymes, Year == "2016"),  -->
-<!--               aes(yintercept = fit1c$coefficients[1], color = Year)) + -->
-<!--    geom_hline(data = subset(enzymes, Year == "2017"),  -->
-<!--               aes(yintercept = fit1c$coefficients[1] + fit1c$coefficients[2], color = Year))+ -->
-<!--    labs(y= "What is this?", -->
-<!--         title= "Change in BG with N and without N") -->
-
-<!-- NAG_by_year -->
-<!-- ``` -->
-
-<!-- ## Explore how AP varies by soil fraction  -->
-<!-- ```{r} -->
-<!-- #ECM trees store more carbon than AM trees, as N deposition increases -->
-
-<!-- fit2 <- lm(BG ~ Mycorrhizae + Year, data= enzymes) -->
-
-<!-- ECMvAM_Carbon <- ggplot(enzymes, aes(y= BG, x= Mycorrhizae, color= Year))+ -->
-<!--    geom_point() -->
-<!--    # geom_hline(data = subset(enzymes, Year == "2016"),  -->
-<!--    #            aes(yintercept = fit1c$coefficients[1], color = Year)) + -->
-<!--    # geom_hline(data = subset(enzymes, Year == "2017"),  -->
-<!--    #            aes(yintercept = fit1c$coefficients[1] + fit1c$coefficients[2], color = Year))+ -->
-<!--    # labs(y= "What is this?", -->
-<!--    #      title= "Change in BG with N and without N") -->
-
-<!-- ECMvAM_Carbon -->
-
-<!-- ``` -->
