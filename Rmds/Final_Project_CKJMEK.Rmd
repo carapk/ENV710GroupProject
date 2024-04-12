@@ -19,12 +19,14 @@ library(lubridate)
 
 ```
 
+
 ```{r import and wrangle data}
 
 lakes_raw <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",stringsAsFactors = TRUE) 
-lakes_new <- read_csv("Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
+do_raw <- read.csv("Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv",stringsAsFactors = TRUE)
 
 lakes_raw$sampledate <- mdy(lakes_raw$sampledate)
+do_raw$sampledate <- mdy(do_raw$sampledate)
 
 lakes_processed <- lakes_raw %>%
   select(lakename, sampledate, depth, tn_ug, tp_ug, nh34, no23, po4) %>%
@@ -33,27 +35,138 @@ lakes_processed <- lakes_raw %>%
   filter(year(sampledate) >= 1994 & year(sampledate) <= 1999) %>%
   mutate(year = factor(year(sampledate)),
          month = factor(month(sampledate)),
-         deep = factor(ifelse(depth > 6, 1, 0))) %>%
-  filter(month %in% c(5,6,7,8))
+         subsurface = factor(ifelse(depth > 1, "subsurface", "surface")),
+         season = factor(ifelse(month == 5, "spring", ifelse(month == 8, "summer", NA)))) %>%
+  filter(month %in% c(5,6,7,8)) %>%
+  mutate(depth = round(depth * 2) / 2)
+
+lakes_processed$subsurface_indicator <- ifelse(lakes_processed$subsurface == "subsurface", 1, 0)
+lakes_processed$summer_indicator <- ifelse(lakes_processed$season == "summer", 1, 0)
+
+lakes_processed <- left_join(lakes_processed, select(do_raw, lakename, sampledate, depth, dissolvedOxygen), by = c("lakename", "sampledate", "depth"))
 
 lake_1994 <- lakes_processed %>% 
   filter(year %in% c(1994)) %>% 
   filter(po4<20) %>% 
   filter(tp_ug<100)
 
-lakes_new$sampledate <- mdy(lakes_new$sampledate)
+```
 
-lakes_chem_processed <- lakes_new %>%
-  select(lakename, sampledate, depth, temperature_C, dissolvedOxygen) %>%
-  na.omit() %>%
-  filter(lakename %in% c("Paul Lake", "West Long Lake", "Peter Lake", "East Long Lake")) %>%
-  filter(year(sampledate) == 1994) %>%
-  mutate(year = factor(year(sampledate)),
-         month = factor(month(sampledate)),
-         deep = factor(ifelse(depth > 6, 1, 0))) %>%
-  filter(month %in% c(5,6,7,8))
+
+```{r import and wrangle data}
+
+# lakes_raw <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",stringsAsFactors = TRUE) 
+# lakes_new <- read_csv("Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
+# 
+# lakes_raw$sampledate <- mdy(lakes_raw$sampledate)
+# 
+# lakes_processed <- lakes_raw %>%
+#   select(lakename, sampledate, depth, tn_ug, tp_ug, nh34, no23, po4) %>%
+#   na.omit() %>%
+#   filter(lakename %in% c("Paul Lake", "West Long Lake", "Peter Lake", "East Long Lake")) %>%
+#   filter(year(sampledate) >= 1994 & year(sampledate) <= 1999) %>%
+#   mutate(year = factor(year(sampledate)),
+#          month = factor(month(sampledate)),
+#          deep = factor(ifelse(depth > 6, 1, 0))) %>%
+#   filter(month %in% c(5,6,7,8))
+# 
+# lake_1994 <- lakes_processed %>% 
+#   filter(year %in% c(1994)) %>% 
+#   filter(po4<20) %>% 
+#   filter(tp_ug<100)
+# 
+# lakes_new$sampledate <- mdy(lakes_new$sampledate)
+# 
+# lakes_chem_processed <- lakes_new %>%
+#   select(lakename, sampledate, depth, temperature_C, dissolvedOxygen) %>%
+#   na.omit() %>%
+#   filter(lakename %in% c("Paul Lake", "West Long Lake", "Peter Lake", "East Long Lake")) %>%
+#   filter(year(sampledate) == 1994) %>%
+#   mutate(year = factor(year(sampledate)),
+#          month = factor(month(sampledate)),
+#          deep = factor(ifelse(depth > 6, 1, 0))) %>%
+#   filter(month %in% c(5,6,7,8))
 
 ```
+
+
+```{r jenn model}
+
+jenn <- lakes_processed
+
+jenn$subsurface_tp_ug = jenn$tp_ug * jenn$subsurface_indicator
+jenn$subsurface_tn_ug = jenn$tn_ug * jenn$subsurface_indicator
+
+jenn_fit_p <- lm(formula = dissolvedOxygen ~ subsurface + tp_ug + subsurface_tp_ug, 
+                 data = jenn)
+
+print(jenn_fit_p)
+
+jenn_fit_n <- lm(formula = dissolvedOxygen ~ subsurface + tn_ug + subsurface_tn_ug, 
+                 data = jenn)
+
+print(jenn_fit_n)
+
+```
+
+a. What is the estimate of $\beta_0$ and what does it represent in terms of DO?
+
+$\beta_0$ for this fit is 8.65, which represents the expected value of DO in surface water with zero total phosphorus.
+
+b. What is the estimate of $\beta_1$ and what does it represent in terms of DO?
+
+$\beta_1$ for this fit is -0.55, which represents the difference in DO between surface water and subsurface water with zero total phosphorus.
+
+c. What is the estimate of $\beta_2$ and what does it represent in terms of DO?
+
+$\beta_2$ for this fit is -0.0002, which represents the expected change in DO for each unit increase in total phosphorus in surface water.
+
+d. What is the estimate of $\beta_3$ and what does it represent in terms of DO?
+
+$\beta_3$ for this fit is -0.046, which represents the adjustment to the slope for each unit increase in total phosphorus in subsurface water.
+
+
+```{r jenn plot}
+
+#plot total phosphorus versus dissolved oxygen
+ggplot(jenn, aes(x=tp_ug, y=dissolvedOxygen, color=subsurface))+
+  geom_point()+
+  geom_abline(intercept = coef(jenn_fit_p)[1], 
+              slope = coef(jenn_fit_p)[3], 
+              color = "steelblue1", size = 1)+
+  geom_abline(intercept = coef(jenn_fit_p)[1] + coef(jenn_fit_p)[2], 
+              slope = coef(jenn_fit_p)[3] + coef(jenn_fit_p)[4], 
+              color = "steelblue4", size = 1)+
+  scale_color_manual(values = c("surface" = "steelblue1", "subsurface" = "steelblue4"))+
+  scale_x_continuous(breaks = seq(0, 300, by = 50))+
+  scale_y_continuous(breaks = seq(0, 15, by = 5))+
+  xlab("total phosphorus (micrograms)")+
+  ylab("dissolved oxygen (units?)")+
+  theme_light()+
+  theme(legend.position="right")+
+  labs(color = "indicator")
+
+#plot total nitrogen versus dissolved oxygen
+ggplot(jenn, aes(x=tn_ug, y=dissolvedOxygen, color=subsurface))+
+  geom_point()+
+  geom_abline(intercept = coef(jenn_fit_n)[1], 
+              slope = coef(jenn_fit_n)[3], 
+              color = "steelblue1", size = 1)+
+  geom_abline(intercept = coef(jenn_fit_n)[1] + coef(jenn_fit_n)[2], 
+              slope = coef(jenn_fit_n)[3] + coef(jenn_fit_n)[4], 
+              color = "steelblue4", size = 1)+
+  scale_color_manual(values = c("surface" = "steelblue1", "subsurface" = "steelblue4"))+
+  scale_x_continuous(breaks = seq(0, 3500, by = 500))+
+  scale_y_continuous(breaks = seq(0, 15, by = 5))+
+  xlab("total nitrogen (micrograms)")+
+  ylab("dissolved oxygen (units?)")+
+  theme_light()+
+  theme(legend.position="right")+
+  labs(color = "indicator")
+
+```
+
+## APPENDIX
 
 ```{r tp by year with po4}
 
