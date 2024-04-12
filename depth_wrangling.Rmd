@@ -1,0 +1,49 @@
+---
+title: "depth_wrangling"
+author: "Jenn McNeill"
+date: "2024-04-12"
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r load packages, include=FALSE}
+
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(tidyverse)
+library(lubridate)
+library(latex2exp)
+library(lubridate)
+
+```
+
+```{r import and wrangle data}
+
+lakes_raw <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",stringsAsFactors = TRUE) 
+do_raw <- read.csv("Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv",stringsAsFactors = TRUE)
+
+lakes_raw$sampledate <- mdy(lakes_raw$sampledate)
+do_raw$sampledate <- mdy(do_raw$sampledate)
+
+lakes_processed <- lakes_raw %>%
+  select(lakename, sampledate, depth, tn_ug, tp_ug, nh34, no23, po4) %>%
+  na.omit() %>%
+  filter(lakename %in% c("Paul Lake", "West Long Lake", "Peter Lake", "East Long Lake")) %>%
+  filter(year(sampledate) >= 1994 & year(sampledate) <= 1999) %>%
+  mutate(year = factor(year(sampledate)),
+         month = factor(month(sampledate)),
+         deep = factor(ifelse(depth > 6, 1, 0))) %>%
+  filter(month %in% c(5,6,7,8)) %>%
+  mutate(depth = round(depth * 2) / 2)
+
+lakes_processed <- left_join(lakes_processed, select(do_raw, lakename, sampledate, depth, dissolvedOxygen), by = c("lakename", "sampledate", "depth"))
+
+lake_1994 <- lakes_processed %>% 
+  filter(year %in% c(1994)) %>% 
+  filter(po4<20) %>% 
+  filter(tp_ug<100)
+
+```
