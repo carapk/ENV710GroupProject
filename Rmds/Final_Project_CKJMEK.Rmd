@@ -53,6 +53,14 @@ lake_1994 <- lakes_processed %>%
 ```
 
 
+```{r Testing and Training}
+# Holdout 20% of data for testing, 80% for training
+lakes_processed$holdout <- rbinom(n=nrow(lakes_processed),size=1,prob=0.2)
+lakes_training <- lakes_processed %>% filter(holdout==0)
+lakes_testing <- lakes_processed %>% filter(holdout==1)
+```
+
+
 ```{r import and wrangle data}
 
 # lakes_raw <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",stringsAsFactors = TRUE) 
@@ -247,7 +255,55 @@ ggplot(jenn, aes(x=tn_ug, y=dissolvedOxygen, color=subsurface))+
   labs(color = "indicator")
 
 ```
+```{r Heirarchical }
+# Fit hierarchical linear mixed-effects model
+fit <- lmer(dissolvedOxygen ~ tp_ug + (1|lakename), data = lakes_processed)
 
+# Summary of the model
+summary(fit)
+
+# Print the model
+print(fit)
+
+# Extract the random effects
+random_effects <- fit@u
+
+# Plotting the relationship between total phosphorus (tp_ug) and dissolved oxygen (dissolvedOxygen) by lakename
+ggplot(lakes_processed, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +  # Add a linear regression line
+  labs(x = "Total Phosphorus (µg)", y = "Dissolved Oxygen (mg/L)", color = "Lake Name") +
+  theme_minimal() +
+  ggtitle("Dissolved Oxygen vs Total Phosphorus by Lake") +
+  theme(legend.position = "bottom")
+
+
+```
+
+```{r}
+
+
+# Residual Plot (Residuals vs Fitted)
+residuals <- resid(fit)
+fitted_values <- fitted(fit)
+
+residual_plot <- data.frame(residuals = residuals, fitted_values = fitted_values)
+
+ggplot(residual_plot, aes(x = fitted_values, y = residuals)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(x = "Fitted Values", y = "Residuals") +
+  ggtitle("Residuals vs Fitted")
+
+# QQ Plot (Normal Q-Q plot)
+qq_plot <- qqnorm(residuals, main = "Normal Q-Q Plot")
+
+# Random Effects Plot (Dot plot of random effects)
+random_effects <- ranef(fit)$lakename
+
+random_effects_plot <- data.frame(lakename = rownames(random_effects), random_effect = random_effects[, 1])
+
+```
 
 
 ## APPENDIX
