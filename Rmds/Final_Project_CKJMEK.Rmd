@@ -16,6 +16,8 @@ library(tidyverse)
 library(lubridate)
 library(latex2exp)
 library(lubridate)
+library(lme4)
+library(Matrix)
 
 ```
 
@@ -70,7 +72,7 @@ lakes_testing <- lakes_processed %>% filter(holdout==1)
 ```
 
 
-```{r import and wrangle data}
+```{r import and wrangle data2}
 
 # lakes_raw <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",stringsAsFactors = TRUE) 
 # lakes_new <- read_csv("Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
@@ -327,178 +329,178 @@ random_effects_plot <- data.frame(lakename = rownames(random_effects), random_ef
 
 ## APPENDIX
 
-```{r tp by year with po4}
+<!-- ```{r tp by year with po4} -->
 
-fit_1 <- lm(formula = tp_ug ~ year + po4, data = lakes_processed)
-print(fit_1)
+<!-- fit_1 <- lm(formula = tp_ug ~ year + po4, data = lakes_processed) -->
+<!-- print(fit_1) -->
 
-ggplot(lakes_processed, aes(x=po4, y=tp_ug, color=year))+
-  geom_point()+
-  geom_abline(intercept = coef(fit_1)[1], slope = coef(fit_1)[7], 
-              color = "orchid3")+
-  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[2], slope = coef(fit_1)[7], 
-              color = "cyan4")+
-  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[3], slope = coef(fit_1)[7], 
-              color = "slateblue")+
-  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[4], slope = coef(fit_1)[7], 
-              color = "tomato3")+
-  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[5], slope = coef(fit_1)[7], 
-              color = "skyblue1")+
-  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[6], slope = coef(fit_1)[7], 
-              color = "limegreen")+
-  scale_color_manual(values = c("1994" = "orchid3", 
-                                "1995" = "cyan4",
-                                "1996" = "slateblue",
-                                "1997" = "tomato3",
-                                "1998" = "skyblue1",
-                                "1999" = "limegreen"))+
-  scale_x_continuous(breaks = seq(0, 200, by = 20))+
-  scale_y_continuous(breaks = seq(0, 300, by = 50))+
-  ylab(expression("Total Phosphorus" ~ (µg))) +
-  xlab(expression("Phosphate" ~ (µg))) +
-  ggtitle("Change in Total Phosphorus in Samples Taken 
-in 1994, 1995, 1996, 1997, 1998, and 1999")+
-  theme_light()+
-  theme(legend.position="bottom")
+<!-- ggplot(lakes_processed, aes(x=po4, y=tp_ug, color=year))+ -->
+<!--   geom_point()+ -->
+<!--   geom_abline(intercept = coef(fit_1)[1], slope = coef(fit_1)[7],  -->
+<!--               color = "orchid3")+ -->
+<!--   geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[2], slope = coef(fit_1)[7],  -->
+<!--               color = "cyan4")+ -->
+<!--   geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[3], slope = coef(fit_1)[7],  -->
+<!--               color = "slateblue")+ -->
+<!--   geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[4], slope = coef(fit_1)[7],  -->
+<!--               color = "tomato3")+ -->
+<!--   geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[5], slope = coef(fit_1)[7],  -->
+<!--               color = "skyblue1")+ -->
+<!--   geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[6], slope = coef(fit_1)[7],  -->
+<!--               color = "limegreen")+ -->
+<!--   scale_color_manual(values = c("1994" = "orchid3",  -->
+<!--                                 "1995" = "cyan4", -->
+<!--                                 "1996" = "slateblue", -->
+<!--                                 "1997" = "tomato3", -->
+<!--                                 "1998" = "skyblue1", -->
+<!--                                 "1999" = "limegreen"))+ -->
+<!--   scale_x_continuous(breaks = seq(0, 200, by = 20))+ -->
+<!--   scale_y_continuous(breaks = seq(0, 300, by = 50))+ -->
+<!--   ylab(expression("Total Phosphorus" ~ (µg))) + -->
+<!--   xlab(expression("Phosphate" ~ (µg))) + -->
+<!--   ggtitle("Change in Total Phosphorus in Samples Taken  -->
+<!-- in 1994, 1995, 1996, 1997, 1998, and 1999")+ -->
+<!--   theme_light()+ -->
+<!--   theme(legend.position="bottom") -->
 
-```
+<!-- ``` -->
 
-```{r tp by month with po4}
+<!-- ```{r tp by month with po4} -->
 
-fit_2 <- lm(formula = tp_ug ~ month + po4, data = lake_1994)
-print(fit_2)
+<!-- fit_2 <- lm(formula = tp_ug ~ month + po4, data = lake_1994) -->
+<!-- print(fit_2) -->
 
-ggplot(lake_1994, aes(x=po4, y=tp_ug, color=month))+
-  geom_point()+
-  geom_abline(intercept = coef(fit_2)[1], slope = coef(fit_2)[5], 
-              color = "orchid3")+
-  geom_abline(intercept = coef(fit_2)[1] + coef(fit_2)[2], slope = coef(fit_2)[5], 
-              color = "cyan4")+
-  geom_abline(intercept = coef(fit_2)[1] + coef(fit_2)[3], slope = coef(fit_2)[5], 
-              color = "slateblue")+
-  geom_abline(intercept = coef(fit_2)[1] + coef(fit_2)[4], slope = coef(fit_2)[5], 
-              color = "tomato3")+
-  scale_color_manual(values = c("5" = "orchid3", 
-                                "6" = "cyan4",
-                                "7" = "slateblue",
-                                "8" = "tomato3"))+
-  #scale_x_continuous(breaks = seq(0, 200, by = 20))+
-  #scale_y_continuous(breaks = seq(0, 300, by = 50))+
-  ylab(expression("Total Phosphorus" ~ (µg))) +
-  xlab(expression("Phosphate" ~ (µg))) +
-  ggtitle("Change in Total Phosphorus in Samples Taken 
-in May, June, July, and August")+
-  theme_light()+
-  theme(legend.position="bottom")
+<!-- ggplot(lake_1994, aes(x=po4, y=tp_ug, color=month))+ -->
+<!--   geom_point()+ -->
+<!--   geom_abline(intercept = coef(fit_2)[1], slope = coef(fit_2)[5],  -->
+<!--               color = "orchid3")+ -->
+<!--   geom_abline(intercept = coef(fit_2)[1] + coef(fit_2)[2], slope = coef(fit_2)[5],  -->
+<!--               color = "cyan4")+ -->
+<!--   geom_abline(intercept = coef(fit_2)[1] + coef(fit_2)[3], slope = coef(fit_2)[5],  -->
+<!--               color = "slateblue")+ -->
+<!--   geom_abline(intercept = coef(fit_2)[1] + coef(fit_2)[4], slope = coef(fit_2)[5],  -->
+<!--               color = "tomato3")+ -->
+<!--   scale_color_manual(values = c("5" = "orchid3",  -->
+<!--                                 "6" = "cyan4", -->
+<!--                                 "7" = "slateblue", -->
+<!--                                 "8" = "tomato3"))+ -->
+<!--   #scale_x_continuous(breaks = seq(0, 200, by = 20))+ -->
+<!--   #scale_y_continuous(breaks = seq(0, 300, by = 50))+ -->
+<!--   ylab(expression("Total Phosphorus" ~ (µg))) + -->
+<!--   xlab(expression("Phosphate" ~ (µg))) + -->
+<!--   ggtitle("Change in Total Phosphorus in Samples Taken  -->
+<!-- in May, June, July, and August")+ -->
+<!--   theme_light()+ -->
+<!--   theme(legend.position="bottom") -->
 
-```
+<!-- ``` -->
 
-```{r tp by deepness binary indicator with po4}
+<!-- ```{r tp by deepness binary indicator with po4} -->
 
-fit_3 <- lm(formula = tp_ug ~ deep + po4, data = lake_1994)
-print(fit_3)
+<!-- fit_3 <- lm(formula = tp_ug ~ deep + po4, data = lake_1994) -->
+<!-- print(fit_3) -->
 
-ggplot(lake_1994, aes(x=po4, y=tp_ug, color=deep))+
-  geom_point()+
-  geom_abline(intercept = coef(fit_3)[1], slope = coef(fit_3)[3], 
-              color = "orchid3")+
-  geom_abline(intercept = coef(fit_3)[1] + coef(fit_3)[2], slope = coef(fit_3)[3], 
-              color = "cyan4")+
-  scale_color_manual(values = c("0" = "orchid3", 
-                                "1" = "cyan4"))+
-  #scale_x_continuous(breaks = seq(0, 20, by = 20))+
-  #scale_y_continuous(breaks = seq(0, 100, by = 50))+
-  ylab(expression("Total Phosphorus" ~ (µg))) +
-  xlab(expression("Phosphate" ~ (µg))) +
-  ggtitle("Change in Total Phosphorus in Samples Taken 
-Above and Below 6 ft Water Depth")+
-  theme_light()+
-  theme(legend.position="bottom")
+<!-- ggplot(lake_1994, aes(x=po4, y=tp_ug, color=deep))+ -->
+<!--   geom_point()+ -->
+<!--   geom_abline(intercept = coef(fit_3)[1], slope = coef(fit_3)[3],  -->
+<!--               color = "orchid3")+ -->
+<!--   geom_abline(intercept = coef(fit_3)[1] + coef(fit_3)[2], slope = coef(fit_3)[3],  -->
+<!--               color = "cyan4")+ -->
+<!--   scale_color_manual(values = c("0" = "orchid3",  -->
+<!--                                 "1" = "cyan4"))+ -->
+<!--   #scale_x_continuous(breaks = seq(0, 20, by = 20))+ -->
+<!--   #scale_y_continuous(breaks = seq(0, 100, by = 50))+ -->
+<!--   ylab(expression("Total Phosphorus" ~ (µg))) + -->
+<!--   xlab(expression("Phosphate" ~ (µg))) + -->
+<!--   ggtitle("Change in Total Phosphorus in Samples Taken  -->
+<!-- Above and Below 6 ft Water Depth")+ -->
+<!--   theme_light()+ -->
+<!--   theme(legend.position="bottom") -->
 
-```
+<!-- ``` -->
 
-```{r tp by lake with po4}
+<!-- ```{r tp by lake with po4} -->
 
-fit_4 <- lm(formula = tp_ug ~ lakename + po4, data = lake_1994)
-print(fit_4)
+<!-- fit_4 <- lm(formula = tp_ug ~ lakename + po4, data = lake_1994) -->
+<!-- print(fit_4) -->
 
-ggplot(lake_1994, aes(x=po4, y=tp_ug, color=lakename))+
-  geom_point()+
-  geom_abline(intercept = coef(fit_4)[1], slope = coef(fit_4)[5], 
-              color = "orchid3")+
-  geom_abline(intercept = coef(fit_4)[1] + coef(fit_4)[2], slope = coef(fit_4)[5], 
-              color = "cyan4")+
-  geom_abline(intercept = coef(fit_4)[1] + coef(fit_4)[3], slope = coef(fit_4)[5], 
-              color = "slateblue")+
-  geom_abline(intercept = coef(fit_4)[1] + coef(fit_4)[4], slope = coef(fit_4)[5], 
-              color = "tomato3")+
-  scale_color_manual(values = c("East Long Lake" = "orchid3", 
-                                "Paul Lake" = "cyan4",
-                                "Peter Lake" = "slateblue",
-                                "West Long Lake" = "tomato3"))+
-  scale_x_continuous(breaks = seq(0, 200, by = 20))+
-  scale_y_continuous(breaks = seq(0, 300, by = 50))+
-  ylab(expression("Total Phosphorus" ~ (µg))) +
-  xlab(expression("Phosphate" ~ (µg))) +
-  ggtitle("Change in Total Phosphorus in Samples Taken 
-at East Long Lake, Paul Lake, Peter Lake, and West Long Lake")+
-  theme_light()+
-  theme(legend.position="bottom")
+<!-- ggplot(lake_1994, aes(x=po4, y=tp_ug, color=lakename))+ -->
+<!--   geom_point()+ -->
+<!--   geom_abline(intercept = coef(fit_4)[1], slope = coef(fit_4)[5],  -->
+<!--               color = "orchid3")+ -->
+<!--   geom_abline(intercept = coef(fit_4)[1] + coef(fit_4)[2], slope = coef(fit_4)[5],  -->
+<!--               color = "cyan4")+ -->
+<!--   geom_abline(intercept = coef(fit_4)[1] + coef(fit_4)[3], slope = coef(fit_4)[5],  -->
+<!--               color = "slateblue")+ -->
+<!--   geom_abline(intercept = coef(fit_4)[1] + coef(fit_4)[4], slope = coef(fit_4)[5],  -->
+<!--               color = "tomato3")+ -->
+<!--   scale_color_manual(values = c("East Long Lake" = "orchid3",  -->
+<!--                                 "Paul Lake" = "cyan4", -->
+<!--                                 "Peter Lake" = "slateblue", -->
+<!--                                 "West Long Lake" = "tomato3"))+ -->
+<!--   scale_x_continuous(breaks = seq(0, 200, by = 20))+ -->
+<!--   scale_y_continuous(breaks = seq(0, 300, by = 50))+ -->
+<!--   ylab(expression("Total Phosphorus" ~ (µg))) + -->
+<!--   xlab(expression("Phosphate" ~ (µg))) + -->
+<!--   ggtitle("Change in Total Phosphorus in Samples Taken  -->
+<!-- at East Long Lake, Paul Lake, Peter Lake, and West Long Lake")+ -->
+<!--   theme_light()+ -->
+<!--   theme(legend.position="bottom") -->
 
-```
+<!-- ``` -->
 
-. 
-```{r Heirarchical at surface}
+<!-- .  -->
+<!-- ```{r Heirarchical at surface} -->
 
-lakes_processed_surface <- lakes_processed %>% 
-  filter(subsurface_indicator==0)
-# Fit hierarchical linear mixed-effects model
-fit <- lmer(dissolvedOxygen ~ tp_ug + (1|lakename), data = lakes_processed_surface)
+<!-- lakes_processed_surface <- lakes_processed %>%  -->
+<!--   filter(subsurface_indicator==0) -->
+<!-- # Fit hierarchical linear mixed-effects model -->
+<!-- fit <- lmer(dissolvedOxygen ~ tp_ug + (1|lakename), data = lakes_processed_surface) -->
 
-# Summary of the model
-summary(fit)
+<!-- # Summary of the model -->
+<!-- summary(fit) -->
 
-# Print the model
-print(fit)
+<!-- # Print the model -->
+<!-- print(fit) -->
 
-# Extract the random effects
-random_effects <- fit@u
+<!-- # Extract the random effects -->
+<!-- random_effects <- fit@u -->
 
-# Plotting the relationship between total phosphorus (tp_ug) and dissolved oxygen (dissolvedOxygen) by lakename
-ggplot(lakes_processed_surface, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) +
-  geom_point() +
-  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +  # Add a linear regression line
-  labs(x = "Total Phosphorus (µg)", y = "Dissolved Oxygen (mg/L)", color = "Lake Name") +
-  theme_minimal() +
-  ggtitle("Dissolved Oxygen vs Total Phosphorus by Lake at Surface") +
-  theme(legend.position = "bottom")
+<!-- # Plotting the relationship between total phosphorus (tp_ug) and dissolved oxygen (dissolvedOxygen) by lakename -->
+<!-- ggplot(lakes_processed_surface, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) + -->
+<!--   geom_point() + -->
+<!--   geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +  # Add a linear regression line -->
+<!--   labs(x = "Total Phosphorus (µg)", y = "Dissolved Oxygen (mg/L)", color = "Lake Name") + -->
+<!--   theme_minimal() + -->
+<!--   ggtitle("Dissolved Oxygen vs Total Phosphorus by Lake at Surface") + -->
+<!--   theme(legend.position = "bottom") -->
 
-```
+<!-- ``` -->
 
-```{r Heirarchical summer}
+<!-- ```{r Heirarchical summer} -->
 
-lakes_processed_summer <- lakes_processed %>% 
-  filter(summer_indicator==1)
-# Fit hierarchical linear mixed-effects model
-fit <- lmer(dissolvedOxygen ~ tp_ug + (1|lakename), data = lakes_processed_summer)
+<!-- lakes_processed_summer <- lakes_processed %>%  -->
+<!--   filter(summer_indicator==1) -->
+<!-- # Fit hierarchical linear mixed-effects model -->
+<!-- fit <- lmer(dissolvedOxygen ~ tp_ug + (1|lakename), data = lakes_processed_summer) -->
 
-# Summary of the model
-summary(fit)
+<!-- # Summary of the model -->
+<!-- summary(fit) -->
 
-# Print the model
-print(fit)
+<!-- # Print the model -->
+<!-- print(fit) -->
 
-# Extract the random effects
-random_effects <- fit@u
+<!-- # Extract the random effects -->
+<!-- random_effects <- fit@u -->
 
-# Plotting the relationship between total phosphorus (tp_ug) and dissolved oxygen (dissolvedOxygen) by lakename
-ggplot(lakes_processed_summer, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) +
-  geom_point() +
-  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +  # Add a linear regression line
-  labs(x = "Total Phosphorus (µg)", y = "Dissolved Oxygen (mg/L)", color = "Lake Name") +
-  theme_minimal() +
-  ggtitle("Dissolved Oxygen vs Total Phosphorus by Lake in Summer") +
-  theme(legend.position = "bottom")
+<!-- # Plotting the relationship between total phosphorus (tp_ug) and dissolved oxygen (dissolvedOxygen) by lakename -->
+<!-- ggplot(lakes_processed_summer, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) + -->
+<!--   geom_point() + -->
+<!--   geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +  # Add a linear regression line -->
+<!--   labs(x = "Total Phosphorus (µg)", y = "Dissolved Oxygen (mg/L)", color = "Lake Name") + -->
+<!--   theme_minimal() + -->
+<!--   ggtitle("Dissolved Oxygen vs Total Phosphorus by Lake in Summer") + -->
+<!--   theme(legend.position = "bottom") -->
 
-```
+<!-- ``` -->
 
