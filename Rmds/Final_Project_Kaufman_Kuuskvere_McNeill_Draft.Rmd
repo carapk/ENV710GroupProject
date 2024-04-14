@@ -20,10 +20,33 @@ a.Clearly define your research question. Include a literature review of similar 
 b. Clearly articulate your research question.
 c. Articulate the hypotheses to be tested.
 
+In this report we examine the relationship of total phosphorus concentration on dissolved oxygen levels in Wisconsin lakes. Adequate levels of dissolved oxygen in lakes are crucial for the aquatic species that reside there. DO levels are at risk for becoming dangerously low when excess organic materials, such as algae, decompose, a process called eutrophication [https://www.epa.gov/national-aquatic-resource-surveys/indicators-dissolved-oxygen]. As a result, it is important to limit algae growth in lakes. When there is too much phosphorus in lakes conditions become suitable for algae blooms resulting in eutrophication. In addition, toxins found in algae blooms are harmful to human and animal health [https://www.epa.gov/national-aquatic-resource-surveys/indicators-phosphorus#:~:text=Too%20much%20phosphorus%20can%20cause,to%20human%20and%20animal%20health.]. 
+
+Total phosphorus in lakes is influenced by rainfall, streamflow, overland runoff, groundwater discharge, decomposition of organic matter, and soil erosion. Humans contribute to phosphorus levels in lakes due to fertilization of agricultural fields and lawns, leaking wastewater, and increased urbanization (https://www.sciencedirect.com/science/article/abs/pii/B9780080176970500134). Most phosphorus in lakes takes the form of dissolved or particulate phosphorus, and total phosphorus is a measure of all forms of phosphorus potentially available to algae [1].
+
+Our research question is three-fold:
+Is there a difference in the impact of total phosphorus on dissolved oxygen levels in the spring versus the summer?
+Is there a difference in the impact of total phosphorus on dissolved oxygen levels in shallow versus subsurface lake water?
+Do West Long, East Long, Peter, and Paul Lake all exhibit the same relationship of how total phosphorus impacts dissolved oxygen levels? 
+
+Our null hypothesis is that total phosphorus has no impact on dissolved oxygen levels.
+Alternative hypothesis is ___
+
 # Methodology 
 a. Describe how the data were collected (this will vary with the type of project).
 b. Describe your data. What are the dependent and independent variables? What are the sources of data? Do you have missing or truncated data and how are you dealing with them?
 c. Provide an overview of your data analysis. What type of model will you use? Do you need to transform your data? How will you check the assumptions of the model?
+
+The data for this project are from lakes in the North Temperate Lakes District of Wisconsin. They were collected at the Long Term Ecological Research station located there. The physical and chemical variables were measured at a central station in the deepest point of each lake. Most measurements were made between 8 and 9 am. The nutrient measurements were made along vertical profiles at varied depth intervals. The dissolved oxygen chemistry data from 1991-1999 were obtained from a Lachat auto-analyser. The methods of data collection from 1991-1997 are described in more detail by Carpenter at al. (2001). More information on this data can be found here: https://lter.limnology.wisc.edu/core-datasets/. 
+
+These datasets contains daily nutrient and lake chemistry data at 26 different lakes within the North Temperate Lakes District in Wisconsin over 25 years. The variables between the two datasets include the lake depth, total nitrogen, total phosphorus, nh34, no23, and po4 concentrations, as well as lake temperature, dissolved oxygen, and irradiance. For the purposes of this project we focus on using lake depth, total phosphorus, and dissolved oxygen data across 4 lakes: East Long Lake, Paul Lake, Peter Lake, and West Long Lake in 1994. 
+
+Our dependent variable is dissolved oxygen (mg/L) and our independent variables are total phosphorus (ug), season (May or August, coded as spring or summer), and depth (<1 ft as surface, deeper than 1 ft as subsurface). 
+
+In this report we use linear models to estimate dissolved oxygen across these lakes based on total phosphorus content sampled within the lakes’ water columns. We examine the difference in the relationship of DO and total phosphorus in spring and summer, as well as the difference in the relationship of DO and total phosphorus at the water surface versus deeper in the water column. Finally, we use a hierarchical linear model to examine the DO and total phosphorus relationship across East Long, West Long, Peter, and Paul lakes. 
+
+In order to check the assumptions of these models we plot the residuals against a normal distribution (qq plot) as well as the residuals vs fitted values to check for constant variance. 
+
 
 # Results 
 a. Exploratory Data Analysis/Descriptive Statistics
