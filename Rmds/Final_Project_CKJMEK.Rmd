@@ -275,6 +275,7 @@ ggplot(lakes_processed, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) +
 a. $\beta_0$ (Intercept): 9.31581
 
 This represents the expected value of dissolved oxygen in surface water with zero total phosphorus.
+
 b. $\beta_1$ (tp_ug): -0.05593
 
 This represents the change in dissolved oxygen for each unit increase in total phosphorus in surface water.
