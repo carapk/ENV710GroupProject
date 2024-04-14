@@ -52,6 +52,15 @@ lake_1994 <- lakes_processed %>%
 
 ```
 
+```{r Initial plots}
+ggplot(lakes_processed)+
+  geom_point(aes(y=dissolvedOxygen,x=subsurface_indicator))
+
+ggplot(lakes_processed)+
+  geom_point(aes(y=dissolvedOxygen,x=season))
+  
+```
+
 
 ```{r Testing and Training}
 # Holdout 20% of data for testing, 80% for training
@@ -255,6 +264,8 @@ ggplot(jenn, aes(x=tn_ug, y=dissolvedOxygen, color=subsurface))+
   labs(color = "indicator")
 
 ```
+
+
 ```{r Heirarchical }
 # Fit hierarchical linear mixed-effects model
 fit <- lmer(dissolvedOxygen ~ tp_ug + (1|lakename), data = lakes_processed)
@@ -280,9 +291,16 @@ ggplot(lakes_processed, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) +
 
 ```
 
-```{r}
+
+a. $\beta_0$ (Intercept): 9.31581
+
+This represents the expected value of dissolved oxygen in surface water with zero total phosphorus.
+b. $\beta_1$ (tp_ug): -0.05593
+
+This represents the change in dissolved oxygen for each unit increase in total phosphorus in surface water.
 
 
+```{r Heirarchical analysis}
 # Residual Plot (Residuals vs Fitted)
 residuals <- resid(fit)
 fitted_values <- fitted(fit)
@@ -304,6 +322,7 @@ random_effects <- ranef(fit)$lakename
 random_effects_plot <- data.frame(lakename = rownames(random_effects), random_effect = random_effects[, 1])
 
 ```
+
 
 
 ## APPENDIX
@@ -427,3 +446,59 @@ at East Long Lake, Paul Lake, Peter Lake, and West Long Lake")+
   theme(legend.position="bottom")
 
 ```
+
+. 
+```{r Heirarchical at surface}
+
+lakes_processed_surface <- lakes_processed %>% 
+  filter(subsurface_indicator==0)
+# Fit hierarchical linear mixed-effects model
+fit <- lmer(dissolvedOxygen ~ tp_ug + (1|lakename), data = lakes_processed_surface)
+
+# Summary of the model
+summary(fit)
+
+# Print the model
+print(fit)
+
+# Extract the random effects
+random_effects <- fit@u
+
+# Plotting the relationship between total phosphorus (tp_ug) and dissolved oxygen (dissolvedOxygen) by lakename
+ggplot(lakes_processed_surface, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +  # Add a linear regression line
+  labs(x = "Total Phosphorus (µg)", y = "Dissolved Oxygen (mg/L)", color = "Lake Name") +
+  theme_minimal() +
+  ggtitle("Dissolved Oxygen vs Total Phosphorus by Lake at Surface") +
+  theme(legend.position = "bottom")
+
+```
+
+```{r Heirarchical summer}
+
+lakes_processed_summer <- lakes_processed %>% 
+  filter(summer_indicator==1)
+# Fit hierarchical linear mixed-effects model
+fit <- lmer(dissolvedOxygen ~ tp_ug + (1|lakename), data = lakes_processed_summer)
+
+# Summary of the model
+summary(fit)
+
+# Print the model
+print(fit)
+
+# Extract the random effects
+random_effects <- fit@u
+
+# Plotting the relationship between total phosphorus (tp_ug) and dissolved oxygen (dissolvedOxygen) by lakename
+ggplot(lakes_processed_summer, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +  # Add a linear regression line
+  labs(x = "Total Phosphorus (µg)", y = "Dissolved Oxygen (mg/L)", color = "Lake Name") +
+  theme_minimal() +
+  ggtitle("Dissolved Oxygen vs Total Phosphorus by Lake in Summer") +
+  theme(legend.position = "bottom")
+
+```
+
