@@ -4,7 +4,7 @@ author: "Emma Kaufman, Cara Kuuskvere, Jenn McNeill"
 date: "2024-04-10"
 output: pdf_document
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 ```{r load packages, include=FALSE}
 
@@ -89,6 +89,88 @@ lake_1994 <- lakes_processed %>%
 
 ```
 
+```{r Season and Phosphorus v DO}
+two_season_clean<- lakes_processed %>% 
+  na.omit()
+
+two_season_fit <- lm(dissolvedOxygen ~ summer_indicator + tp_ug + summer_indicator*tp_ug,
+                     data= two_season_clean)
+
+summary(two_season_fit)
+
+
+```
+
+a. What is the estimate of $\beta_0$ and what does it represent in terms of DO (dissolved oxygen)?
+
+$\beta_0$ for this fit is 10.22 mg/L, which represents the expected value of DO in spring with zero total phosphorus.
+
+b. What is the estimate of $\beta_1$ and what does it represent in terms of DO?
+
+$\beta_1$ for this fit is -1.52, which represents the difference in DO between spring and summer with zero total phosphorus. In summer the expected dissolved oxygen is 8.7 mg/L. 
+
+c. What is the estimate of $\beta_2$ and what does it represent in terms of DO?
+
+$\beta_2$ for this fit is -0.063 (mg/L)/ug, which represents the expected change in DO for each unit increase in total phosphorus during spring.
+
+d. What is the estimate of $\beta_3$ and what does it represent in terms of DO?
+
+$\beta_3$ for this fit is 0.02 (mg/L)/ug, which represents the adjustment to the slope for each unit increase in total phosphorus during the summer. In the summer the expected change in DO for each unit increase in total phosphorus is -0.045 (mg/L)/ug. 
+```{r Season and Phosphorus v DO plot}
+
+Two_Season_P <- ggplot(two_season_clean, aes(x=tp_ug, y=dissolvedOxygen, color=season))+
+  geom_point()+
+  geom_abline(intercept = coef(two_season_fit)[1],
+              slope = coef(two_season_fit)[3],
+              color = "thistle3", size = 1)+
+  geom_abline(intercept = coef(two_season_fit)[1] + coef(two_season_fit)[2],
+              slope = coef(two_season_fit)[3] + coef(two_season_fit)[4],
+              color = "darkgoldenrod1", size = 1)+
+  scale_color_manual(values = c("spring" = "thistle3", "summer" = "darkgoldenrod1"))+
+  scale_x_continuous(breaks = seq(0, 300, by = 50))+
+  scale_y_continuous(breaks = seq(0, 15, by = 5))+
+  xlab(expression("Total Phosphorus" ~ (µg)))+
+  ylab("dissolved oxygen (mg/L)")+
+  theme_light()+
+  theme(legend.position="right")+
+  labs(color = "Season")
+
+Two_Season_P
+```
+
+```{r looking at residuals for season and phosphorus and MAPE}
+plot(two_season_fit)
+
+
+```
+
+
+
+```{r exploratory for appendix, looking at nitrogen and season v DO}
+
+two_season_nitrogen <- lm(dissolvedOxygen ~ summer_indicator + tn_ug + summer_indicator*tn_ug,
+                     data= two_season_clean)
+
+ ggplot(two_season_clean, aes(x=tn_ug, y=dissolvedOxygen, color=season))+
+  geom_point()+
+  geom_abline(intercept = coef(two_season_nitrogen)[1],
+              slope = coef(two_season_nitrogen)[3],
+              color = "thistle3", size = 1)+
+  geom_abline(intercept = coef(two_season_nitrogen)[1] + coef(two_season_nitrogen)[2],
+              slope = coef(two_season_nitrogen)[3] + coef(two_season_nitrogen)[4],
+              color = "darkgoldenrod1", size = 1)+
+  scale_color_manual(values = c("spring" = "thistle3", "summer" = "darkgoldenrod1"))+
+  # scale_x_continuous(breaks = seq(0, 300, by = 50))+
+  # scale_y_continuous(breaks = seq(0, 15, by = 5))+
+  xlab(expression("Total Nitrogen" ~ (µg)))+
+  ylab("dissolved oxygen (mg/L)")+
+  theme_light()+
+  theme(legend.position="right")+
+  labs(color = "Season")
+
+```
+
+
 
 ```{r jenn model}
 
@@ -165,6 +247,8 @@ ggplot(jenn, aes(x=tn_ug, y=dissolvedOxygen, color=subsurface))+
   labs(color = "indicator")
 
 ```
+
+
 
 ## APPENDIX
 
