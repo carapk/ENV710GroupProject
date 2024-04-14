@@ -1,0 +1,43 @@
+---
+title: 'Final Lab: Fertilizers and Lake Chemistry'
+author: "Emma Kaufman, Cara Kuuskvere, and Jenn McNeill" 
+date: "April 16th, 2024"
+output: pdf_document
+toc: true
+---
+
+```{=tex}
+\newpage
+\listoftables 
+\newpage
+\listoffigures 
+\newpage
+```
+
+
+# Introduction
+a.Clearly define your research question. Include a literature review of similar studies that describe why your study is useful, interesting and situates it in the current knowledge of the subject. (~ 2 paragraphs)
+b. Clearly articulate your research question.
+c. Articulate the hypotheses to be tested.
+
+# Methodology 
+a. Describe how the data were collected (this will vary with the type of project).
+b. Describe your data. What are the dependent and independent variables? What are the sources of data? Do you have missing or truncated data and how are you dealing with them?
+c. Provide an overview of your data analysis. What type of model will you use? Do you need to transform your data? How will you check the assumptions of the model?
+
+# Results 
+a. Exploratory Data Analysis/Descriptive Statistics
+  i.Summarize your data/results (e.g., number observations, measures of central tendency and     variation).
+b. Statistical Analysis
+  i. Discuss the findings of your statistics and models. Make sure to interpret the strength     of the effects of your variables, not just whether they were significantly important or     not.
+  ii. Discuss the assumptions of your underlying the statistical tool and whether the         assumptions were met?
+  
+# Discussion and Conclusion
+a. Discuss overall findings, statistical vs. practical significance.
+b. What is the scope of inference? To what population can you infer?
+c. How do your results compare to previous studies, your expectations or hypotheses?
+d. What were the limitations of your study? What would you do to improve the study?
+
+# Description of each participants role on project
+
+# Bibliography
