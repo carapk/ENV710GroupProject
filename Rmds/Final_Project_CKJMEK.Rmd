@@ -149,9 +149,7 @@ print(MAPE_seasonal)
 
 ```
 
-\newpage 
-
-```{r seasonal model plot, fig.cap="Figure 1", echo=FALSE, message=FALSE}
+```{r seasonal model plot, fig.cap="Figure 1", echo=FALSE, message=FALSE, warning=FALSE}
 
 ggplot(two_season_clean, aes(x=tp_ug, y=dissolvedOxygen, color=season))+
   geom_point()+
@@ -173,8 +171,6 @@ ggplot(two_season_clean, aes(x=tp_ug, y=dissolvedOxygen, color=season))+
 
 ```
 
-\newpage 
-
 ```{r seasonal model residuals, include = FALSE, message=FALSE, warning=FALSE}
 plot(two_season_fit)
 ```
@@ -191,7 +187,7 @@ We tried to improve our model by normalizing the data with a log transformation 
 
 These results show that with increasing concentrations of phosphorus, there is a decrease in dissolved oxygen, and that the impact of phosphorus on DO levels is slightly stronger in the spring. These results are significant (all of the p-values are less than 0.05 for each coefficient), but that doesn't mean they are the best model of these data. The MAPE score of 2.99 shows that there is high error when you compare the fitted and observed data.
 
-## MODEL FIT TWO: Dissolved Oxygen by Total Phosphorus with a Water Depth Binary Indicator Variable and a Water Depth Interaction Term
+## MODEL FIT TWO: Dissolved Oxygen (DO) by Total Phosphorus (TP) with a Water Depth Binary Indicator Variable and a Water Depth Interaction Term
 
 ```{r depth model, include = FALSE, message=FALSE, warning=FALSE}
 
@@ -207,25 +203,9 @@ print(jenn_fit_p)
 
 ```
 
-a.  What is the estimate of $\beta_0$ and what does it represent in terms of DO?
-
-$\beta_0$ for this fit is 8.52 mg/L, which represents the expected value of DO in surface water with zero total phosphorus.
-
-b.  What is the estimate of $\beta_1$ and what does it represent in terms of DO?
-
-$\beta_1$ for this fit is -7.67 mg/L, which represents the difference in DO between surface water and subsurface water with zero total phosphorus.
-
-c.  What is the estimate of $\beta_2$ and what does it represent in terms of DO?
-
-$\beta_2$ for this fit is -0.0002 (mg/L)/ug, which represents the expected change in DO for each unit increase in total phosphorus in surface water.
-
-d.  What is the estimate of $\beta_3$ and what does it represent in terms of DO?
-
-$\beta_3$ for this fit is -0.003 (mg/L)/ug, which represents the adjustment to the slope for each unit increase in total phosphorus in subsurface water.
-
 | Variable              | Value       | Interpretation                                                          |
 |-------------------|-------------------|----------------------------------|
-| $\beta_0$ (Intercept) | 8.52 mg/L   | Expected value of DO in surface water with 0tp                          |
+| $\beta_0$ (Intercept) | 8.52 mg/L   | Expected value of DO in surface water with 0 tp                          |
 | $\beta_1$             | -7.67 mg/L  | Difference in DO b/w sub- and surface water with 0 tp                   |
 | $\beta_2$             | -.0002 mg/L | Expected change in D0 for each unit increase in tp in surface water     |
 | $\beta_3$             | -0.003 mg/L | Adjustment to slope for interaction term between tp in subsurface water |
@@ -259,9 +239,7 @@ print(MAPE_depth)
 
 ```
 
-\newpage 
-
-```{r depth plot, fig.cap = "Figure 2", echo=FALSE, message=FALSE}
+```{r depth plot, fig.cap = "Figure 2", echo=FALSE, message=FALSE, warning=FALSE}
 
 #plot total phosphorus versus dissolved oxygen
 ggplot(jenn, aes(x=tp_ug, y=dissolvedOxygen, color=subsurface))+
@@ -284,13 +262,19 @@ ggplot(jenn, aes(x=tp_ug, y=dissolvedOxygen, color=subsurface))+
 
 ```
 
-\newpage 
-
 ```{r depth model residuals, include = FALSE, message=FALSE, warning=FALSE}
 
 plot(jenn_fit_p)
 
 ```
+
+### Results Model Two
+
+The results from this model tell us that the expected value for dissolved oxygen in surface waters with zero total phosphorus is 8.52 mg/L. In subsurface waters with zero total phosphorus, the dissolved oxygen level decreases by 7.67 mg/L. The rate of change of the dissolved oxygen concentration for each unit increase of micrograms of total phosphorus in the water is -0.0002 in surface waters and -0.003 for subsurface waters.
+
+Figure 2 shows a graphical representation of this linear model. These data are consistent with our assumptions given what we know about the relationship between dissolved oxygen and total phosphorus. As total phosphorus levels increase, the phosphorus in the water stimulates the growth of algae, a process known as eutrophication. This algae consumes the oxygen in the water as it decomposes, and the level of dissolved oxygen decreases. Simultaneously, the algae growth in the water halts the production of oxygen because the water gets murkier and plants are not able to photosynthesize as efficiently. Knowing that this process occurs, it is logical that the levels of dissolved oxygen are lower in deeper waters because the sun penetration is weaker and plants are not photosynthesizing enough to overcome the depletion of oxygen caused by eutrophication. It follows that the downward slope of the line is also logical because the dissolved oxygen is decreasing as total phosphorus increases.
+
+Although the results of this linear model are consistent with our predictions, the model still has a high degree of error. The QQ plot shown in Appendix Plot 2 does not form a straight line, which means that the residuals from this model do not follow a normal distribution. The clouds of data points in Figure 2 are consistent with this observation; the points are not evenly distributed about the best fit line. Additionally, the MAPE score of 2.01 is an improvement as compared to the first model we fit but still shows a high degree of error. 
 
 ## MODEL FIT THREE: Dissolved Oxygen by Total Phosphorus with a Hierarchical Linear Mixed Effects Lake Variable
 
@@ -345,9 +329,7 @@ print(MAPE_hierarchical)
 
 ```
 
-\newpage 
-
-```{r hierarchical plot, fig.cap = "Figure 3", echo=FALSE, message=FALSE}
+```{r hierarchical plot, fig.cap = "Figure 3", echo=FALSE, message=FALSE, warning=FALSE}
 
 ggplot(lakes_processed, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) +
   geom_point() +
@@ -360,8 +342,6 @@ ggplot(lakes_processed, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) +
   theme(legend.position = "right")
 
 ```
-
-\newpage 
 
 ```{r hierarchical model residuals, include = FALSE, message=FALSE, warning=FALSE}
 
@@ -407,7 +387,19 @@ The depth model has the lowest MAPE value, indicating that this fit is the best 
 
 Scientific evidence demonstrates increases in phosphorus lead to decreases in dissolved oxygen due to eutrophication events in bodies of water. However, this data, along with our research, does not indicate an exact relationship. The two clusters of data may suggest that beyond a certain quantity of phosphorus, or perhaps after a threshold required for a eutrophication event, dissolved oxygen drops to near zero. Thus, while we were unable to uncover quality models to predict the outcome of the quantity of dissolved oxygen based upon our variables, we were able to see this slight negative relationship and critical quantity at which dissolved oxygen largely does not exist beyond near zero values at high quantities of phosophorus.
 
-# APPENDIX
+# Bibliography
+
+Carpenter, S. R., Cole, J. J., Hodgson, J. R., Kitchell, J. F., Pace, M. L., Bade, D., ... & Schindler, D. E. (2001). Trophic cascades, nutrients, and lake productivity: whole‐lake experiments. Ecological monographs, 71(2), 163-186.
+
+Lee, G. F. (1973). Role of phosphorus in eutrophication and diffuse source control. In Phosphorus in Fresh Water and the Marine Environment (pp. 111-128). Pergamon.
+
+Total nitrogen/total phosphorus and chlorophyll a: Volunteer data entry and information: indiana clean lakes program: indiana university. (n.d.). Indiana Clean Lakes Program. Retrieved April 15, 2024, from https://clp.indiana.edu/volunteer-data/phosphorus-chlorophyll.html
+
+US EPA, O. (2013, November 20). Indicators: Dissolved oxygen [Overviews and Factsheets]. https://www.epa.gov/national-aquatic-resource-surveys/indicators-dissolved-oxygen
+
+US EPA, O. (2013, November 27). Indicators: Phosphorus [Overviews and Factsheets]. https://www.epa.gov/national-aquatic-resource-surveys/indicators-phosphorus
+
+# Appendix
 
 ### Model One Residuals
 
