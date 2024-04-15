@@ -7,6 +7,7 @@ editor_options:
   chunk_output_type: console
 toc: true
 ---
+
 ```{r load packages, include=FALSE}
 
 library(readr)
@@ -21,8 +22,7 @@ library(lme4)
 
 ```
 
-
-```{r import and wrangle data}
+```{r import and wrangle data, include=FALSE}
 
 lakes_raw <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",stringsAsFactors = TRUE) 
 do_raw <- read.csv("Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv",stringsAsFactors = TRUE)
@@ -42,10 +42,15 @@ lakes_processed <- lakes_raw %>%
   filter(month %in% c(5,6,7,8)) %>%
   mutate(depth = round(depth * 2) / 2)
 
-lakes_processed$subsurface_indicator <- ifelse(lakes_processed$subsurface == "subsurface", 1, 0)
-lakes_processed$summer_indicator <- ifelse(lakes_processed$season == "summer", 1, 0)
+lakes_processed$subsurface_indicator <- 
+  ifelse(lakes_processed$subsurface == "subsurface", 1, 0)
 
-lakes_processed <- left_join(lakes_processed, select(do_raw, lakename, sampledate, depth, dissolvedOxygen), by = c("lakename", "sampledate", "depth"))
+lakes_processed$summer_indicator <- 
+  ifelse(lakes_processed$season == "summer", 1, 0)
+
+lakes_processed <- left_join(lakes_processed, 
+                             select(do_raw, lakename, sampledate, depth, dissolvedOxygen), 
+                             by = c("lakename", "sampledate", "depth"))
 
 lake_1994 <- lakes_processed %>% 
   filter(year %in% c(1994)) %>% 
@@ -54,81 +59,10 @@ lake_1994 <- lakes_processed %>%
 
 ```
 
-```{r attempt to wrangle with all years and DO less than 5}
 
-lakes_all_years <- lakes_raw %>%
-  select(lakename, sampledate, depth, tn_ug, tp_ug, nh34, no23, po4) %>%
-  na.omit() %>%
-  filter(lakename %in% c("Paul Lake", "West Long Lake", "Peter Lake", "East Long Lake")) %>%
-  mutate(year = factor(year(sampledate)),
-         month = factor(month(sampledate)),
-         subsurface = factor(ifelse(depth > 1, "subsurface", "surface")),
-         season = factor(ifelse(month == 5, "spring", ifelse(month == 8, "summer", NA)))) %>%
-  filter(month %in% c(5,6,7,8)) %>%
-  mutate(depth = round(depth * 2) / 2)
+## MODEL FIT ONE: Dissolved Oxygen by Total Phosphorus with a Seasonal Binary Indicator Variable and a Seasonal Interaction Term
 
-lakes_all_years$subsurface_indicator <- ifelse(lakes_all_years$subsurface == "subsurface", 1, 0)
-lakes_all_years$summer_indicator <- ifelse(lakes_all_years$season == "summer", 1, 0)
-
-lakes_all_years <- left_join(lakes_all_years, select(do_raw, lakename, sampledate, depth, dissolvedOxygen), by = c("lakename", "sampledate", "depth"))
-
-lakes_all_years <- lakes_all_years %>%
-  filter(dissolvedOxygen <= 5)
-
-```
-
-```{r attempt to plot all years with emmas model}
-
-two_season_clean_new <- lakes_all_years %>% 
-  na.omit()
-
-two_season_fit_new <- lm(dissolvedOxygen ~ summer_indicator + tp_ug + summer_indicator*tp_ug,
-                     data = two_season_clean_new)
-
-summary(two_season_fit_new)
-
-ggplot(two_season_clean_new, aes(x=tp_ug, y=dissolvedOxygen, color=season))+
-  geom_point()+
-  geom_abline(intercept = coef(two_season_fit_new)[1],
-              slope = coef(two_season_fit_new)[3],
-              color = "thistle3", size = 1)+
-  geom_abline(intercept = coef(two_season_fit_new)[1] + coef(two_season_fit_new)[2],
-              slope = coef(two_season_fit_new)[3] + coef(two_season_fit_new)[4],
-              color = "darkgoldenrod1", size = 1)+
-  scale_color_manual(values = c("spring" = "thistle3", "summer" = "darkgoldenrod1"))+
-  scale_x_continuous(breaks = seq(0, 300, by = 50))+
-  scale_y_continuous(breaks = seq(0, 15, by = 5))+
-  xlab(expression("Total Phosphorus" ~ (µg)))+
-  ylab("dissolved oxygen (mg/L)")+
-  theme_light()+
-  theme(legend.position="right")+
-  labs(color = "Season")
-
-```
-
-
-
-```{r Initial plots}
-ggplot(lakes_processed)+
-  geom_point(aes(y=dissolvedOxygen,x=subsurface_indicator))+
-  theme_light()
-
-ggplot(lakes_processed)+
-  geom_point(aes(y=dissolvedOxygen,x=season))+
-  theme_light()
-  
-```
-
-
-```{r Testing and Training}
-# Holdout 20% of data for testing, 80% for training
-lakes_processed$holdout <- rbinom(n=nrow(lakes_processed),size=1,prob=0.2)
-lakes_training <- lakes_processed %>% filter(holdout==0)
-lakes_testing <- lakes_processed %>% filter(holdout==1)
-```
-
-
-```{r Season and Phosphorus v DO}
+```{r seasonal model, include=FALSE}
 
 two_season_clean <- lakes_processed %>% 
   na.omit()
@@ -138,8 +72,25 @@ two_season_fit <- lm(dissolvedOxygen ~ summer_indicator + tp_ug + summer_indicat
 
 summary(two_season_fit)
 
-two_season_fit_log <- lm(dissolvedOxygen ~ summer_indicator + log(tp_ug) +
-                           summer_indicator*tp_ug, data = two_season_clean)
+```
+
+a. What is the estimate of $\beta_0$ and what does it represent in terms of DO (dissolved oxygen)?
+
+$\beta_0$ for this fit is 10.14 mg/L, which represents the expected value of DO in spring with zero total phosphorus.
+
+b. What is the estimate of $\beta_1$ and what does it represent in terms of DO?
+
+$\beta_1$ for this fit is -2.36, which represents the difference in DO between spring and summer with zero total phosphorus. In summer the expected dissolved oxygen is 8.7 mg/L. 
+
+c. What is the estimate of $\beta_2$ and what does it represent in terms of DO?
+
+$\beta_2$ for this fit is -0.067 (mg/L)/ug, which represents the expected change in DO for each unit increase in total phosphorus during spring.
+
+d. What is the estimate of $\beta_3$ and what does it represent in terms of DO?
+
+$\beta_3$ for this fit is 0.02 (mg/L)/ug, which represents the adjustment to the slope for each unit increase in total phosphorus during the summer. In the summer the expected change in DO for each unit increase in total phosphorus is -0.045 (mg/L)/ug. 
+
+```{r seasonal model holdout and MAPE calculation, include = FALSE}
 
 # Holdout 20% of data for testing, 80% for training
 
@@ -152,39 +103,25 @@ two_season_fit_test <- lm(dissolvedOxygen ~ summer_indicator + tp_ug + summer_in
 
 print(two_season_fit_test)
 
-two_season_fit_test_beta_0 <- 10.52
-two_season_fit_test_beta_1 <- -1.84
-two_season_fit_test_beta_2 <- -0.06
-two_season_fit_test_beta_3 <- 0.02
+two_season_fit_test_beta_0 <- 10.33176
+two_season_fit_test_beta_1 <- -2.54724
+two_season_fit_test_beta_2 <- -0.07045
+two_season_fit_test_beta_3 <- 0.02518
 
 two_season_testing$do_predicted <- two_season_fit_test_beta_0 + 
     two_season_fit_test_beta_1*two_season_testing$summer_indicator +
     two_season_fit_test_beta_2*two_season_testing$tp_ug +
     two_season_fit_test_beta_3*two_season_testing$summer_indicator*two_season_testing$tp_ug
 
-sqrt(mean((two_season_testing$dissolvedOxygen - two_season_testing$do_predicted)^2))
+MAPE_seasonal <- sqrt(mean((two_season_testing$dissolvedOxygen - two_season_testing$do_predicted)^2))
+
+print(MAPE_seasonal)
 
 ```
 
-a. What is the estimate of $\beta_0$ and what does it represent in terms of DO (dissolved oxygen)?
+```{r seasonal model plot, fig.align = 'left', fig.cap = "Figure 1"}
 
-$\beta_0$ for this fit is 10.22 mg/L, which represents the expected value of DO in spring with zero total phosphorus.
-
-b. What is the estimate of $\beta_1$ and what does it represent in terms of DO?
-
-$\beta_1$ for this fit is -1.52, which represents the difference in DO between spring and summer with zero total phosphorus. In summer the expected dissolved oxygen is 8.7 mg/L. 
-
-c. What is the estimate of $\beta_2$ and what does it represent in terms of DO?
-
-$\beta_2$ for this fit is -0.063 (mg/L)/ug, which represents the expected change in DO for each unit increase in total phosphorus during spring.
-
-d. What is the estimate of $\beta_3$ and what does it represent in terms of DO?
-
-$\beta_3$ for this fit is 0.02 (mg/L)/ug, which represents the adjustment to the slope for each unit increase in total phosphorus during the summer. In the summer the expected change in DO for each unit increase in total phosphorus is -0.045 (mg/L)/ug. 
-
-```{r Season and Phosphorus v DO plot}
-
-Two_Season_P <- ggplot(two_season_clean, aes(x=tp_ug, y=dissolvedOxygen, color=season))+
+ggplot(two_season_clean, aes(x=tp_ug, y=dissolvedOxygen, color=season))+
   geom_point()+
   geom_abline(intercept = coef(two_season_fit)[1],
               slope = coef(two_season_fit)[3],
@@ -196,23 +133,24 @@ Two_Season_P <- ggplot(two_season_clean, aes(x=tp_ug, y=dissolvedOxygen, color=s
   scale_x_continuous(breaks = seq(0, 300, by = 50))+
   scale_y_continuous(breaks = seq(0, 15, by = 5))+
   xlab(expression("Total Phosphorus" ~ (µg)))+
-  ylab("dissolved oxygen (mg/L)")+
+  ylab("Dissolved Oxygen (mg/L)")+
+  ggtitle("Dissolved Oxygen vs Total Phosphorus by Season")+
   theme_light()+
   theme(legend.position="right")+
   labs(color = "Season")
 
-Two_Season_P
-
 ```
 
-```{r looking at residuals for season and phosphorus and MAPE}
+```{r seasonal model residuals, include = FALSE}
 
 plot(two_season_fit)
 
 ```
 **discuss the poor model fit in results and talk about how we attempted to log transform the x axis and tried to use a subset of the y axis dissolved oxygen, but we still didn't see normal distribution of residuals or constant variance of residuals. reference the plots but include them in the appendix.
 
-```{r jenn model}
+## MODEL FIT TWO: Dissolved Oxygen by Total Phosphorus with a Water Depth Binary Indicator Variable and a Water Depth Interaction Term
+
+```{r depth model, include = FALSE}
 
 jenn <- lakes_processed
 
@@ -224,7 +162,25 @@ jenn_fit_p <- lm(formula = dissolvedOxygen ~ subsurface_indicator + tp_ug + subs
 
 print(jenn_fit_p)
 
-plot(jenn_fit_p)
+```
+
+a. What is the estimate of $\beta_0$ and what does it represent in terms of DO?
+
+$\beta_0$ for this fit is 8.52 mg/L, which represents the expected value of DO in surface water with zero total phosphorus.
+
+b. What is the estimate of $\beta_1$ and what does it represent in terms of DO?
+
+$\beta_1$ for this fit is -7.67 mg/L, which represents the difference in DO between surface water and subsurface water with zero total phosphorus.
+
+c. What is the estimate of $\beta_2$ and what does it represent in terms of DO?
+
+$\beta_2$ for this fit is -0.0002 (mg/L)/ug, which represents the expected change in DO for each unit increase in total phosphorus in surface water.
+
+d. What is the estimate of $\beta_3$ and what does it represent in terms of DO?
+
+$\beta_3$ for this fit is -0.003 (mg/L)/ug, which represents the adjustment to the slope for each unit increase in total phosphorus in subsurface water.
+
+```{r depth model holdout and MAPE calculation, include = FALSE}
 
 # Holdout 20% of data for testing, 80% for training
 
@@ -237,39 +193,23 @@ jenn_fit_p_test <- lm(formula = dissolvedOxygen ~ subsurface_indicator + tp_ug +
 
 print(jenn_fit_p_test)
 
-jenn_fit_p_test_beta_0 <- 8.56
-jenn_fit_p_test_beta_1 <- -7.70
-jenn_fit_p_test_beta_2 <- 0.00
-jenn_fit_p_test_beta_3 <- 0.00
+jenn_fit_p_test_beta_0 <- 8.531495
+jenn_fit_p_test_beta_1 <- -7.680194
+jenn_fit_p_test_beta_2 <- 0.001925
+jenn_fit_p_test_beta_3 <- -0.005985
 
 jenn_testing$do_predicted <- jenn_fit_p_test_beta_0 + 
     jenn_fit_p_test_beta_1*jenn_testing$subsurface_indicator +
     jenn_fit_p_test_beta_2*jenn_testing$tp_ug +
     jenn_fit_p_test_beta_3*jenn_testing$subsurface_tp_ug
 
-sqrt(mean((jenn_testing$dissolvedOxygen - jenn_testing$do_predicted)^2, na.rm = TRUE))
+MAPE_depth <- sqrt(mean((jenn_testing$dissolvedOxygen - jenn_testing$do_predicted)^2, na.rm = TRUE))
+
+print(MAPE_depth)
 
 ```
 
-**CHANGE ALL OF THESE VALUES
-a. What is the estimate of $\beta_0$ and what does it represent in terms of DO?
-
-$\beta_0$ for this fit is 8.65 mg/L, which represents the expected value of DO in surface water with zero total phosphorus.
-
-b. What is the estimate of $\beta_1$ and what does it represent in terms of DO?
-
-$\beta_1$ for this fit is -0.55 mg/L, which represents the difference in DO between surface water and subsurface water with zero total phosphorus.
-
-c. What is the estimate of $\beta_2$ and what does it represent in terms of DO?
-
-$\beta_2$ for this fit is -0.0002 (mg/L)/ug, which represents the expected change in DO for each unit increase in total phosphorus in surface water.
-
-d. What is the estimate of $\beta_3$ and what does it represent in terms of DO?
-
-$\beta_3$ for this fit is -0.046 (mg/L)/ug, which represents the adjustment to the slope for each unit increase in total phosphorus in subsurface water.
-
-
-```{r jenn plot}
+```{r depth plot, fig.align = 'left', fig.cap = "Figure 2"}
 
 #plot total phosphorus versus dissolved oxygen
 ggplot(jenn, aes(x=tp_ug, y=dissolvedOxygen, color=subsurface))+
@@ -283,16 +223,25 @@ ggplot(jenn, aes(x=tp_ug, y=dissolvedOxygen, color=subsurface))+
   scale_color_manual(values = c("surface" = "steelblue1", "subsurface" = "steelblue4"))+
   scale_x_continuous(breaks = seq(0, 300, by = 50))+
   scale_y_continuous(breaks = seq(0, 15, by = 5))+
-  xlab(expression("total phosphorus" ~ (µg)))+
-  ylab("dissolved oxygen (mg/L)")+
+  xlab(expression("Total Phosphorus" ~ (µg)))+
+  ylab("Dissolved Oxygen (mg/L)")+
+  ggtitle("Dissolved Oxygen vs Total Phosphorus by Water Depth")+
   theme_light()+
   theme(legend.position="right")+
   labs(color = "depth")
 
 ```
 
+```{r depth model residuals, include = FALSE}
 
-```{r Heirarchical }
+plot(jenn_fit_p)
+
+```
+
+## MODEL FIT THREE: Dissolved Oxygen by Total Phosphorus with a Hierarchical Linear Mixed Effects Lake Variable
+
+```{r hierarchical model, include = FALSE}
+
 # Fit hierarchical linear mixed-effects model
 fit <- lmer(dissolvedOxygen ~ tp_ug + (1|lakename), data = lakes_processed)
 
@@ -305,42 +254,54 @@ print(fit)
 # Extract the random effects
 random_effects <- fit@u
 
+```
+
+a. $\beta_0$ (Intercept): 8.68 mg/L
+
+This represents the expected value of dissolved oxygen in surface water with zero total phosphorus.
+
+b. $\beta_1$ (tp_ug): -0.055 mg/L
+
+This represents the change in dissolved oxygen for each unit increase in total phosphorus in surface water.
+
+```{r hierarchical model holdout and MAPE calculation, include = FALSE}
+
 # Holdout 20% of data for testing, 80% for training
+lakes_processed$holdout <- rbinom(n=nrow(lakes_processed),size=1,prob=0.2)
+lakes_training <- lakes_processed %>% filter(holdout==0)
+lakes_testing <- lakes_processed %>% filter(holdout==1)
 fit_test <- lmer(dissolvedOxygen ~ tp_ug + (1|lakename), data = lakes_training)
 
 print(fit_test)
 
-fit_test_beta_0 <- 8.689
-fit_test_beta_1 <- -0.055
+fit_test_beta_0 <- 8.70408
+fit_test_beta_1 <- -0.05471
 
 lakes_testing$do_predicted <- fit_test_beta_0 + 
     fit_test_beta_1*lakes_testing$tp_ug
 
-sqrt(mean((lakes_testing$dissolvedOxygen - lakes_testing$do_predicted)^2, na.rm = TRUE))
+MAPE_hierarchical <- sqrt(mean((lakes_testing$dissolvedOxygen - lakes_testing$do_predicted)^2, na.rm = TRUE))
 
-# Plotting the relationship between total phosphorus (tp_ug) and dissolved oxygen (dissolvedOxygen) by lakename
+print(MAPE_hierarchical)
+
+```
+
+```{r hierarchical plot, fig.align = 'left', fig.cap = "Figure 3"}
+
 ggplot(lakes_processed, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) +
   geom_point() +
   geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +  # Add a linear regression line
   labs(x = "Total Phosphorus (µg)", y = "Dissolved Oxygen (mg/L)", color = "Lake Name") +
-  theme_minimal() +
+  scale_x_continuous(breaks = seq(0, 300, by = 50))+
+  scale_y_continuous(breaks = seq(0, 20, by = 5))+
+  theme_light() +
   ggtitle("Dissolved Oxygen vs Total Phosphorus by Lake") +
-  theme(legend.position = "bottom")
-
+  theme(legend.position = "right")
 
 ```
 
-**CHANGE
-a. $\beta_0$ (Intercept): 9.31581
+```{r hierarchical model residuals, include = FALSE}
 
-This represents the expected value of dissolved oxygen in surface water with zero total phosphorus.
-
-b. $\beta_1$ (tp_ug): -0.05593
-
-This represents the change in dissolved oxygen for each unit increase in total phosphorus in surface water.
-
-
-```{r Heirarchical analysis}
 # Residual Plot (Residuals vs Fitted)
 residuals <- resid(fit)
 fitted_values <- fitted(fit)
@@ -366,103 +327,60 @@ random_effects_plot <- data.frame(lakename = rownames(random_effects), random_ef
 
 
 ## APPENDIX
-```{r import and wrangle data}
 
-# lakes_raw <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",stringsAsFactors = TRUE) 
-# lakes_new <- read_csv("Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
-# 
-# lakes_raw$sampledate <- mdy(lakes_raw$sampledate)
-# 
-# lakes_processed <- lakes_raw %>%
-#   select(lakename, sampledate, depth, tn_ug, tp_ug, nh34, no23, po4) %>%
-#   na.omit() %>%
-#   filter(lakename %in% c("Paul Lake", "West Long Lake", "Peter Lake", "East Long Lake")) %>%
-#   filter(year(sampledate) >= 1994 & year(sampledate) <= 1999) %>%
-#   mutate(year = factor(year(sampledate)),
-#          month = factor(month(sampledate)),
-#          deep = factor(ifelse(depth > 6, 1, 0))) %>%
-#   filter(month %in% c(5,6,7,8))
-# 
-# lake_1994 <- lakes_processed %>% 
-#   filter(year %in% c(1994)) %>% 
-#   filter(po4<20) %>% 
-#   filter(tp_ug<100)
-# 
-# lakes_new$sampledate <- mdy(lakes_new$sampledate)
-# 
-# lakes_chem_processed <- lakes_new %>%
-#   select(lakename, sampledate, depth, temperature_C, dissolvedOxygen) %>%
-#   na.omit() %>%
-#   filter(lakename %in% c("Paul Lake", "West Long Lake", "Peter Lake", "East Long Lake")) %>%
-#   filter(year(sampledate) == 1994) %>%
-#   mutate(year = factor(year(sampledate)),
-#          month = factor(month(sampledate)),
-#          deep = factor(ifelse(depth > 6, 1, 0))) %>%
-#   filter(month %in% c(5,6,7,8))
+# Model One Residuals
+```{r seasonal model residuals, include = FALSE}
+
+plot(two_season_fit)
 
 ```
 
-```{r log transformation of emma's model x axis}
+# Model Two Residuals
+```{r depth model residuals, include = FALSE}
 
-Two_Season_P_log <- ggplot(two_season_clean, aes(x=log(tp_ug), y=dissolvedOxygen, color=season))+
-  geom_point()+
-  geom_abline(intercept = coef(two_season_fit_log)[1],
-              slope = coef(two_season_fit_log)[3],
-              color = "thistle3", size = 1)+
-  geom_abline(intercept = coef(two_season_fit_log)[1] + coef(two_season_fit_log)[2],
-              slope = coef(two_season_fit_log)[3] + coef(two_season_fit_log)[4],
-              color = "darkgoldenrod1", size = 1)+
-  scale_color_manual(values = c("spring" = "thistle3", "summer" = "darkgoldenrod1"))+
-  #scale_x_continuous(breaks = seq(0, 300, by = 50))+
-  #scale_y_continuous(breaks = seq(0, 15, by = 5))+
-  xlab(expression("Log Transformed Total Phosphorus" ~ (µg)))+
-  ylab("dissolved oxygen (mg/L)")+
-  theme_light()+
-  theme(legend.position="right")+
-  labs(color = "Season")
-
-Two_Season_P_log
+plot(jenn_fit_p)
 
 ```
 
+# Model Three Residuals
+```{r hierarchical model residuals, echo = FALSE}
 
-```{r tp by year with po4}
+# Residual Plot (Residuals vs Fitted)
+residuals <- resid(fit)
+fitted_values <- fitted(fit)
 
-fit_1 <- lm(formula = tp_ug ~ year + po4, data = lakes_processed)
-print(fit_1)
+residual_plot <- data.frame(residuals = residuals, fitted_values = fitted_values)
 
-ggplot(lakes_processed, aes(x=po4, y=tp_ug, color=year))+
-  geom_point()+
-  geom_abline(intercept = coef(fit_1)[1], slope = coef(fit_1)[7], 
-              color = "orchid3")+
-  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[2], slope = coef(fit_1)[7], 
-              color = "cyan4")+
-  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[3], slope = coef(fit_1)[7], 
-              color = "slateblue")+
-  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[4], slope = coef(fit_1)[7], 
-              color = "tomato3")+
-  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[5], slope = coef(fit_1)[7], 
-              color = "skyblue1")+
-  geom_abline(intercept = coef(fit_1)[1] + coef(fit_1)[6], slope = coef(fit_1)[7], 
-              color = "limegreen")+
-  scale_color_manual(values = c("1994" = "orchid3", 
-                                "1995" = "cyan4",
-                                "1996" = "slateblue",
-                                "1997" = "tomato3",
-                                "1998" = "skyblue1",
-                                "1999" = "limegreen"))+
-  scale_x_continuous(breaks = seq(0, 200, by = 20))+
-  scale_y_continuous(breaks = seq(0, 300, by = 50))+
-  ylab(expression("Total Phosphorus" ~ (µg))) +
-  xlab(expression("Phosphate" ~ (µg))) +
-  ggtitle("Change in Total Phosphorus in Samples Taken 
-in 1994, 1995, 1996, 1997, 1998, and 1999")+
-  theme_light()+
-  theme(legend.position="bottom")
+ggplot(residual_plot, aes(x = fitted_values, y = residuals)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(x = "Fitted Values", y = "Residuals") +
+  ggtitle("Residuals vs Fitted")
+
+# QQ Plot (Normal Q-Q plot)
+qq_plot <- qqnorm(residuals, main = "Normal Q-Q Plot")
+
+# Random Effects Plot (Dot plot of random effects)
+random_effects <- ranef(fit)$lakename
+
+random_effects_plot <- data.frame(lakename = rownames(random_effects), random_effect = random_effects[, 1])
 
 ```
 
-```{r tp by month with po4}
+```{r exploratory plots, echo=FALSE}
+
+ggplot(lakes_processed)+
+  geom_point(aes(y=dissolvedOxygen,x=subsurface_indicator))+
+  theme_light()
+
+ggplot(lakes_processed)+
+  geom_point(aes(y=dissolvedOxygen,x=season))+
+  theme_light()
+  
+```
+
+
+```{r tp by month with po4, echo=FALSE}
 
 fit_2 <- lm(formula = tp_ug ~ month + po4, data = lake_1994)
 print(fit_2)
@@ -481,8 +399,8 @@ ggplot(lake_1994, aes(x=po4, y=tp_ug, color=month))+
                                 "6" = "cyan4",
                                 "7" = "slateblue",
                                 "8" = "tomato3"))+
-  #scale_x_continuous(breaks = seq(0, 200, by = 20))+
-  #scale_y_continuous(breaks = seq(0, 300, by = 50))+
+  scale_x_continuous(breaks = seq(0, 20, by = 5))+
+  scale_y_continuous(breaks = seq(0, 100, by = 20))+
   ylab(expression("Total Phosphorus" ~ (µg))) +
   xlab(expression("Phosphate" ~ (µg))) +
   ggtitle("Change in Total Phosphorus in Samples Taken 
@@ -492,31 +410,7 @@ in May, June, July, and August")+
 
 ```
 
-```{r tp by deepness binary indicator with po4}
-
-fit_3 <- lm(formula = tp_ug ~ deep + po4, data = lake_1994)
-print(fit_3)
-
-ggplot(lake_1994, aes(x=po4, y=tp_ug, color=deep))+
-  geom_point()+
-  geom_abline(intercept = coef(fit_3)[1], slope = coef(fit_3)[3], 
-              color = "orchid3")+
-  geom_abline(intercept = coef(fit_3)[1] + coef(fit_3)[2], slope = coef(fit_3)[3], 
-              color = "cyan4")+
-  scale_color_manual(values = c("0" = "orchid3", 
-                                "1" = "cyan4"))+
-  #scale_x_continuous(breaks = seq(0, 20, by = 20))+
-  #scale_y_continuous(breaks = seq(0, 100, by = 50))+
-  ylab(expression("Total Phosphorus" ~ (µg))) +
-  xlab(expression("Phosphate" ~ (µg))) +
-  ggtitle("Change in Total Phosphorus in Samples Taken 
-Above and Below 6 ft Water Depth")+
-  theme_light()+
-  theme(legend.position="bottom")
-
-```
-
-```{r tp by lake with po4}
+```{r tp by lake with po4, echo=FALSE}
 
 fit_4 <- lm(formula = tp_ug ~ lakename + po4, data = lake_1994)
 print(fit_4)
@@ -535,8 +429,8 @@ ggplot(lake_1994, aes(x=po4, y=tp_ug, color=lakename))+
                                 "Paul Lake" = "cyan4",
                                 "Peter Lake" = "slateblue",
                                 "West Long Lake" = "tomato3"))+
-  scale_x_continuous(breaks = seq(0, 200, by = 20))+
-  scale_y_continuous(breaks = seq(0, 300, by = 50))+
+  scale_x_continuous(breaks = seq(0, 20, by = 5))+
+  scale_y_continuous(breaks = seq(0, 100, by = 20))+
   ylab(expression("Total Phosphorus" ~ (µg))) +
   xlab(expression("Phosphate" ~ (µg))) +
   ggtitle("Change in Total Phosphorus in Samples Taken 
@@ -546,9 +440,7 @@ at East Long Lake, Paul Lake, Peter Lake, and West Long Lake")+
 
 ```
 
-
-
-```{r exploratory for appendix, looking at nitrogen and season v DO}
+```{r exploratory for appendix looking at nitrogen and season v DO, echo=FALSE}
 
 two_season_nitrogen <- lm(dissolvedOxygen ~ summer_indicator + tn_ug + summer_indicator*tn_ug,
                      data= two_season_clean)
@@ -573,9 +465,9 @@ two_season_nitrogen <- lm(dissolvedOxygen ~ summer_indicator + tn_ug + summer_in
 ```
 
 
-```{r for the appendix}
+```{r depth model with nitrogen, echo=FALSE}
 
-jenn_fit_n <- lm(formula = dissolvedOxygen ~ subsurface + tn_ug + subsurface_tn_ug, 
+jenn_fit_n <- lm(formula = dissolvedOxygen ~ subsurface_indicator + tn_ug + subsurface_tn_ug, 
                  data = jenn)
 
 print(jenn_fit_n)
@@ -601,7 +493,7 @@ ggplot(jenn, aes(x=tn_ug, y=dissolvedOxygen, color=subsurface))+
 ```
 
 
-```{r Heirarchical at surface}
+```{r Heirarchical at surface, echo=FALSE}
 
 lakes_processed_surface <- lakes_processed %>% 
   filter(subsurface_indicator==0)
@@ -628,7 +520,7 @@ ggplot(lakes_processed_surface, aes(x = tp_ug, y = dissolvedOxygen, color = lake
 
 ```
 
-```{r Heirarchical summer}
+```{r Heirarchical summer, echo=FALSE}
 
 lakes_processed_summer <- lakes_processed %>% 
   filter(summer_indicator==1)
@@ -654,4 +546,58 @@ ggplot(lakes_processed_summer, aes(x = tp_ug, y = dissolvedOxygen, color = laken
   theme(legend.position = "bottom")
 
 ```
+
+```{r new wrangling with all years and DO less than 5, echo=FALSE}
+
+lakes_all_years <- lakes_raw %>%
+  select(lakename, sampledate, depth, tn_ug, tp_ug, nh34, no23, po4) %>%
+  na.omit() %>%
+  filter(lakename %in% c("Paul Lake", "West Long Lake", "Peter Lake", "East Long Lake")) %>%
+  mutate(year = factor(year(sampledate)),
+         month = factor(month(sampledate)),
+         subsurface = factor(ifelse(depth > 1, "subsurface", "surface")),
+         season = factor(ifelse(month == 5, "spring", ifelse(month == 8, "summer", NA)))) %>%
+  filter(month %in% c(5,6,7,8)) %>%
+  mutate(depth = round(depth * 2) / 2)
+
+lakes_all_years$subsurface_indicator <- 
+  ifelse(lakes_all_years$subsurface == "subsurface", 1, 0)
+
+lakes_all_years$summer_indicator <- 
+  ifelse(lakes_all_years$season == "summer", 1, 0)
+
+lakes_all_years <- left_join(lakes_all_years, 
+                             select(do_raw, lakename, sampledate, depth, dissolvedOxygen), 
+                             by = c("lakename", "sampledate", "depth"))
+
+lakes_all_years <- lakes_all_years %>%
+  filter(dissolvedOxygen <= 5)
+
+```
+
+
+```{r log transformation of emma's model x axis, echo=FALSE}
+
+two_season_fit_log <- lm(dissolvedOxygen ~ summer_indicator + log(tp_ug) +
+                           summer_indicator*tp_ug, data = two_season_clean)
+
+ggplot(two_season_clean, aes(x=log(tp_ug), y=dissolvedOxygen, color=season))+
+  geom_point()+
+  geom_abline(intercept = coef(two_season_fit_log)[1],
+              slope = coef(two_season_fit_log)[3],
+              color = "thistle3", size = 1)+
+  geom_abline(intercept = coef(two_season_fit_log)[1] + coef(two_season_fit_log)[2],
+              slope = coef(two_season_fit_log)[3] + coef(two_season_fit_log)[4],
+              color = "darkgoldenrod1", size = 1)+
+  scale_color_manual(values = c("spring" = "thistle3", "summer" = "darkgoldenrod1"))+
+  #scale_x_continuous(breaks = seq(0, 300, by = 50))+
+  #scale_y_continuous(breaks = seq(0, 15, by = 5))+
+  xlab(expression("Log Transformed Total Phosphorus" ~ (µg)))+
+  ylab("dissolved oxygen (mg/L)")+
+  theme_light()+
+  theme(legend.position="right")+
+  labs(color = "Season")
+
+```
+
 
