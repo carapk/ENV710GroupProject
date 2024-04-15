@@ -410,7 +410,7 @@ random_effects_plot <- data.frame(lakename = rownames(random_effects), random_ef
 
 ```
 
-```{r}
+```{r include=FALSE}
 # Define the t value
 t_value_tp_ug <- -25.64
 
