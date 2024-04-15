@@ -315,14 +315,6 @@ random_effects <- fit@u
 
 ```
 
-a.  $\beta_0$ (Intercept): 8.68 mg/L
-
-This represents the expected value of dissolved oxygen with zero total phosphorus.
-
-b.  $\beta_1$ (tp_ug): -0.055 mg/L
-
-This represents the change in dissolved oxygen for each unit increase in total phosphorus in surface water.
-
 | Variable              | Value               | Interpretation                                          |
 |-------------------|-------------------|----------------------------------|
 | $\beta_0$ (Intercept) | 8.68 mg/L           | Expected value of D0 with zero phosphorus               |
