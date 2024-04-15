@@ -33,7 +33,7 @@ The data for this project are from lakes in the North Temperate Lakes District o
 These datasets contain daily nutrient and lake chemistry data at 26 different lakes within the North Temperate Lakes District in Wisconsin over 25 years. The variables between the two datasets include the lake depth, total nitrogen, total phosphorus, nh34, no23, and po4 concentrations, as well as lake temperature, dissolved oxygen, and irradiance. For the purposes of this project we focus on using lake depth, total phosphorus, and dissolved oxygen data across 4 lakes: East Long Lake, Paul Lake, Peter Lake, and West Long Lake from 1994 to 1999. A table of these variables is found below:
 
 | Variable Analyzed     | Unit of Measure               | Type of Variable           |
-|---------------------|-------------------------------|--------------------|
+|-------------------|---------------------------|--------------------------|
 | Lake Name             | Name Factor                   | Character/ Factor          |
 | Depth                 | Meters below surface          | Numeric ; binary indicator |
 | Season                | Spring (May)/ Summer (August) | Binary indicator           |
@@ -41,6 +41,14 @@ These datasets contain daily nutrient and lake chemistry data at 26 different la
 | Phosphorus            | $\mu$g                        | Numeric                    |
 
 Our dependent variable is dissolved oxygen (mg/L) and our independent variables are total phosphorus ($\mu$g), season (May or August, coded as spring or summer), and depth (\<6 ft as surface, deeper than 6 ft as subsurface).
+
+Our initial data exploration of the range and measures of central tendency of each of our numeric variables is as follows:
+
+| Variable                   | Mean  | Median | Range          |
+|----------------------------|-------|--------|----------------|
+| Total Phosphorus $\mu$g    | 34.91 | 19.47  | -3.04 - 284.03 |
+| Depth Meters below surface | 3.67  | 2      | 0- 12          |
+| Dissolved Oxygen mg/ Liter | 5.96  | 7      | 0 - 17.3       |
 
 In this report we use linear models to estimate dissolved oxygen across these lakes based on total phosphorus content sampled within the lakes' water columns. We examine the difference in the relationship of DO and total phosphorus in spring and summer, as well as the difference in the relationship of DO and total phosphorus at the water surface versus deeper in the water column. Finally, we use a hierarchical linear model to examine the DO and total phosphorus relationship across East Long, West Long, Peter, and Paul lakes.
 
@@ -97,7 +105,20 @@ lake_1994 <- lakes_processed %>%
 
 ```
 
-# Results
+```{r Data Exploration}
+# Calculate mean, median, and range for TP, depth, and DO
+mean_tp <- mean(lakes_processed$tp_ug)
+median_tp <- median(lakes_processed$tp_ug)
+range_tp <- range(lakes_processed$tp_ug)
+
+mean_depth <- mean(lakes_processed$depth)
+median_depth <- median(lakes_processed$depth)
+range_depth <- range(lakes_processed$depth)
+
+mean_DO <- mean(na.omit(lakes_processed_summer$dissolvedOxygen))
+median_DO <- median(na.omit(lakes_processed_summer$dissolvedOxygen))
+range_DO <- range(na.omit(lakes_processed_summer$dissolvedOxygen))
+```
 
 ## MODEL FIT ONE: Dissolved Oxygen (DO) by Total Phosphorus (TP) with a Seasonal Binary Indicator Variable and a Seasonal Interaction Term
 
@@ -205,7 +226,7 @@ print(jenn_fit_p)
 
 | Variable              | Value       | Interpretation                                                          |
 |-------------------|-------------------|----------------------------------|
-| $\beta_0$ (Intercept) | 8.52 mg/L   | Expected value of DO in surface water with 0 tp                          |
+| $\beta_0$ (Intercept) | 8.52 mg/L   | Expected value of DO in surface water with 0 tp                         |
 | $\beta_1$             | -7.67 mg/L  | Difference in DO b/w sub- and surface water with 0 tp                   |
 | $\beta_2$             | -.0002 mg/L | Expected change in D0 for each unit increase in tp in surface water     |
 | $\beta_3$             | -0.003 mg/L | Adjustment to slope for interaction term between tp in subsurface water |
@@ -274,7 +295,7 @@ The results from this model tell us that the expected value for dissolved oxygen
 
 Figure 2 shows a graphical representation of this linear model. These data are consistent with our assumptions given what we know about the relationship between dissolved oxygen and total phosphorus. As total phosphorus levels increase, the phosphorus in the water stimulates the growth of algae, a process known as eutrophication. This algae consumes the oxygen in the water as it decomposes, and the level of dissolved oxygen decreases. Simultaneously, the algae growth in the water halts the production of oxygen because the water gets murkier and plants are not able to photosynthesize as efficiently. Knowing that this process occurs, it is logical that the levels of dissolved oxygen are lower in deeper waters because the sun penetration is weaker and plants are not photosynthesizing enough to overcome the depletion of oxygen caused by eutrophication. It follows that the downward slope of the line is also logical because the dissolved oxygen is decreasing as total phosphorus increases.
 
-Although the results of this linear model are consistent with our predictions, the model still has a high degree of error. The QQ plot shown in Appendix Plot 2 does not form a straight line, which means that the residuals from this model do not follow a normal distribution. The clouds of data points in Figure 2 are consistent with this observation; the points are not evenly distributed about the best fit line. Additionally, the MAPE score of 2.01 is an improvement as compared to the first model we fit but still shows a high degree of error. 
+Although the results of this linear model are consistent with our predictions, the model still has a high degree of error. The QQ plot shown in Appendix Plot 2 does not form a straight line, which means that the residuals from this model do not follow a normal distribution. The clouds of data points in Figure 2 are consistent with this observation; the points are not evenly distributed about the best fit line. Additionally, the MAPE score of 2.01 is an improvement as compared to the first model we fit but still shows a high degree of error.
 
 ## MODEL FIT THREE: Dissolved Oxygen by Total Phosphorus with a Hierarchical Linear Mixed Effects Lake Variable
 
@@ -369,23 +390,45 @@ random_effects_plot <- data.frame(lakename = rownames(random_effects), random_ef
 
 ### Model Three Results
 
-This model evaluates dissolved oxygen (dependent) based upon total phosphorus (independent) in each lake in our subset. The hierarchical model evaluates these two variables, with consideration that each lake may have introduce differences in the relationship between the two, whose impacts should not be reflected in the pure randomness between the two variables but can be generalized between all lakes. Like the previous two models, linearity is assumed in the data, along with independence due to the nature of the data collection process. Normality of residuals and homoscedasticity are assumptions made of successful models, however our diagnostic plots demonstrate that this does not
+This model evaluates dissolved oxygen (dependent) based upon total phosphorus (independent) in each lake in our subset. The hierarchical model evaluates these two variables, with consideration that each lake may introduce differences in the relationship between the two, whose impacts should not be reflected in the pure randomness between the two variables but can be generalized between all lakes. Figure 3 shows a graphical representation of this model. Like the previous two models, linearity is assumed in the data, along with independence due to the nature of the data collection process. Normality of residuals and homoscedasticity are assumptions made of successful models, however our diagnostic plots demonstrate that these assumptions were not met.
 
-Based on the full dataset, the fixed estimate for the total phosphorus in micrograms is approximately -0.056, and for the training dataset it is approximately -0.054. Given the fixed estimate based on the full dataset, this suggests that for every one-unit increase in total phosphorus, dissolved oxygen decreases by approximately 0.056 units.
+Based on the full dataset, the fixed estimate for the total phosphorus in micrograms is approximately -0.056, and for the training dataset it is approximately -0.054. Given the fixed estimate based on the full dataset, this suggests that for every one-unit increase in total phosphorus, dissolved oxygen decreases by approximately 0.056 units. The random effects, particularly the intercept variance at the lake level (0.6096), indicate that there are differences among lakes that contribute to the variation in dissolved oxygen beyond what can be explained by total phosphorus alone.
+
+The model's assumptions regarding linearity and independence hold, as expected based on the nature of the hierarchical model. However, the diagnostic plots reveal departures from normality of residuals and homoscedasticity, suggesting that the model may not fully capture all nuances in the data. Despite these limitations, the model provides valuable insights into the relationship between total phosphorus and dissolved oxygen, accounting for lake-specific effects that might otherwise confound the analysis.
+
+In terms of model performance, the Mean Absolute Percentage Error (MAPE) score of 3.32 indicates a fairly high degree of error when comparing the fitted values to the observed data. This suggests that while the model may provides useful estimates, there is muhch room for improvement in capturing the variability in dissolved oxygen explained by total phosphorus across different lakes. Further refinements or alternative modeling approaches may be warranted to enhance predictive accuracy and better account for the complexities in the data.
 
 # Analysis and Conclusion
 
+Model Performance: To assess the effectiveness of our models in predicting dissolved oxygen (DO) levels based on total phosphorus (TP) concentrations, we evaluated three different models: Depth Model, Seasonal Model, and Hierarchical Model by Lakename. Each model's performance was measured using the Mean Absolute Percentage Error (MAPE) metric, providing insights into the accuracy of predictions compared to observed data.
+
 | Model                          | MAPE |
 |--------------------------------|------|
-| Depth Model                    | 2.01 |
-| Seasonal Model                 | 2.93 |
-| Hierarchical Model by Lakename | 3.07 |
+| Depth Model                    | 2.42 |
+| Seasonal Model                 | 3.02 |
+| Hierarchical Model by Lakename | 3.31 |
 
-While each of our fits demonstrate slight relationships between the variables investigated, the residual analysis of each indicates that error is not randomly distributed in every model. Further, the plots show two main "clouds" of data, with clusters of points at both high dissolved oxygen and low phosphorus, and consistently low (near zero) dissolved oxygen at the full range of phosphorus levels. This, along with other efforts seen in the appendix aimed at transforming or separating data based on different indicators, failed to separate these two clouds of data points beyond manually sub-setting the data based on dissolved oxygen and phosphorus values.
+The MAPE values indicate the percentage difference between predicted and observed DO values, with lower MAPE values indicating better model performance. Among the models evaluated, the Depth Model yielded the lowest MAPE, suggesting it provides the most accurate predictions compared to the other models evaluated
 
-The depth model has the lowest MAPE value, indicating that this fit is the best of our three we evaluate. This aligns with expectations, as depth should have a larger effect on the quantity of dissolved oxygen due to gas exchange at the surface and mixing. While the depth model is best of the three we evaluate, there are also distinct difference between spring (may) and summer (august) data as well as differecnes between each lake in the relationship between phosphorus and dissolved oxygen.
+Residual Analysis and Model Assumptions
 
-Scientific evidence demonstrates increases in phosphorus lead to decreases in dissolved oxygen due to eutrophication events in bodies of water. However, this data, along with our research, does not indicate an exact relationship. The two clusters of data may suggest that beyond a certain quantity of phosphorus, or perhaps after a threshold required for a eutrophication event, dissolved oxygen drops to near zero. Thus, while we were unable to uncover quality models to predict the outcome of the quantity of dissolved oxygen based upon our variables, we were able to see this slight negative relationship and critical quantity at which dissolved oxygen largely does not exist beyond near zero values at high quantities of phosophorus.
+Despite the relatively lower MAPE of the Depth Model, all three models exhibited issues with the distribution of residuals and model assumptions. Residual analysis revealed non-normal distribution and heteroscedasticity, indicating that the models may not fully capture the variability in DO explained by TP concentrations.
+
+Hypothesis Testing Results
+
+Based on the hypothesis tests conducted for each model given the p-values of our statistical evaluations, all coefficients associated with TP were found to be statistically significant (p \< 0.05). This indicates a significant relationship between TP concentrations and DO levels across the lakes studied.
+
+Interpretation and Insights
+
+Our analysis suggests a negative relationship between TP concentrations and DO levels, consistent with the phenomenon of eutrophication where increased TP leads to decreased DO due to algae growth and oxygen consumption. However, the presence of distinct data clusters, as observed in residual plots, raises questions about the exact nature of this relationship.
+
+The two clusters of data, one showing high DO and low TP and the other showing consistently low DO across a range of TP values, imply potential thresholds or critical points where TP concentrations drastically impact DO levels. Beyond these thresholds, DO levels may drop significantly, possibly indicating eutrophication events leading to near-zero DO levels.
+
+Limitations and Future Directions While our models provide valuable insights into the TP-DO relationship, several limitations exist. The non-normality of residuals and heteroscedasticity indicate that our models may not fully capture all nuances in the data. Future research could explore alternative modeling approaches or data transformations to improve model accuracy and address these limitations.
+
+Additionally, our study focused on TP as the sole predictor of DO levels. Including other variables such as temperature, pH, and nutrient concentrations could enhance the predictive power of our models and provide a more comprehensive understanding of factors influencing DO in lakes.
+
+In conclusion, while our models demonstrate a negative relationship between TP concentrations and DO levels, further refinement and exploration are needed to better predict and understand the complexities of this relationship, especially regarding critical thresholds and non-linear effects.
 
 # Bibliography
 
@@ -393,11 +436,11 @@ Carpenter, S. R., Cole, J. J., Hodgson, J. R., Kitchell, J. F., Pace, M. L., Bad
 
 Lee, G. F. (1973). Role of phosphorus in eutrophication and diffuse source control. In Phosphorus in Fresh Water and the Marine Environment (pp. 111-128). Pergamon.
 
-Total nitrogen/total phosphorus and chlorophyll a: Volunteer data entry and information: indiana clean lakes program: indiana university. (n.d.). Indiana Clean Lakes Program. Retrieved April 15, 2024, from https://clp.indiana.edu/volunteer-data/phosphorus-chlorophyll.html
+Total nitrogen/total phosphorus and chlorophyll a: Volunteer data entry and information: indiana clean lakes program: indiana university. (n.d.). Indiana Clean Lakes Program. Retrieved April 15, 2024, from <https://clp.indiana.edu/volunteer-data/phosphorus-chlorophyll.html>
 
-US EPA, O. (2013, November 20). Indicators: Dissolved oxygen [Overviews and Factsheets]. https://www.epa.gov/national-aquatic-resource-surveys/indicators-dissolved-oxygen
+US EPA, O. (2013, November 20). Indicators: Dissolved oxygen [Overviews and Factsheets]. <https://www.epa.gov/national-aquatic-resource-surveys/indicators-dissolved-oxygen>
 
-US EPA, O. (2013, November 27). Indicators: Phosphorus [Overviews and Factsheets]. https://www.epa.gov/national-aquatic-resource-surveys/indicators-phosphorus
+US EPA, O. (2013, November 27). Indicators: Phosphorus [Overviews and Factsheets]. <https://www.epa.gov/national-aquatic-resource-surveys/indicators-phosphorus>
 
 # Appendix
 
