@@ -8,15 +8,43 @@ editor_options:
 toc: true
 ---
 
-## Introduction
+# Introduction
 
-| Variable Analyzed | Unit of Measure                | Type of Variable           |
+In this report we examine the relationship of total phosphorus concentration on dissolved oxygen levels in Wisconsin lakes. Adequate levels of dissolved oxygen in lakes are crucial for the aquatic species that reside there. DO levels are at risk for becoming dangerously low when excess organic materials, such as algae, decompose, a process called eutrophication (US EPA, 2013). As a result, it is important to limit algae growth in lakes. When there is too much phosphorus in lakes conditions become suitable for algae blooms resulting in eutrophication. In addition, toxins found in algae blooms are harmful to human and animal health (US EPA, 2013).
+
+Total phosphorus in lakes is influenced by rainfall, stream flow, overland runoff, groundwater discharge, decomposition of organic matter, and soil erosion. Humans contribute to phosphorus levels in lakes due to fertilization of agricultural fields and lawns, leaking waste water, and increased urbanization (Lee, 1973). Most phosphorus in lakes takes the form of dissolved or particulate phosphorus, and total phosphorus is a measure of all forms of phosphorus potentially available to algae (Total Nitrogen/Total Phosphorus and Chlorophyll a, n.d.).
+
+Our research questions and associated hypotheses are three-fold:
+
+-   Is there a difference in the impact of total phosphorus on dissolved oxygen levels in the spring versus the summer?
+    -   $H_0$: There is no difference in the impact of phosphorus on DO in the spring versus the summer.
+    -   $H_a$: There is a difference in the impact of phosphorus on DO in spring versus summer.
+-   Is there a difference in the impact of total phosphorus on dissolved oxygen levels in shallow versus subsurface lake water?
+    -   $H_0$: There is no difference in the impact of phosphorus on DO in surface and subsurface lake water.
+    -   $H_a$: There is a difference in the impact of phosphorus on DO in surface and subsurface lake water.
+-   Do West Long, East Long, Peter, and Paul Lake all exhibit the same relationship of how total phosphorus impacts dissolved oxygen levels?
+    -   $H_0$: All of these lakes display the same relationship of how total phosphorus impacts dissolved oxygen levels.
+    -   $H_a$: The impact of phosphorus on DO is different across these lakes.
+
+# Methods
+
+The data for this project are from lakes in the North Temperate Lakes District of Wisconsin. They were collected at the Long Term Ecological Research station located there. The physical and chemical variables were measured at a central station in the deepest point of each lake. Most measurements were made between 8 and 9 am. The nutrient measurements were made along vertical profiles at varied depth intervals. The dissolved oxygen chemistry data from 1991-1999 were obtained from a Lachat auto-analyser. The methods of data collection from 1991-1997 are described in more detail by Carpenter at al. (2001). More information on this data can be found here: <https://lter.limnology.wisc.edu/core-datasets/>.
+
+These datasets contain daily nutrient and lake chemistry data at 26 different lakes within the North Temperate Lakes District in Wisconsin over 25 years. The variables between the two datasets include the lake depth, total nitrogen, total phosphorus, nh34, no23, and po4 concentrations, as well as lake temperature, dissolved oxygen, and irradiance. For the purposes of this project we focus on using lake depth, total phosphorus, and dissolved oxygen data across 4 lakes: East Long Lake, Paul Lake, Peter Lake, and West Long Lake from 1994 to 1999. A table of these variables is found below:
+
+| Variable Analyzed     | Unit of Measure               | Type of Variable           |
 |---------------------|-------------------------------|--------------------|
-| Lake Name         | Name Factor                    | Character/ Factor          |
-| Depth             | Meters below surface           | Numeric ; binary indicator |
-| Season            | Spring/ Summer, based on month | Binary indicator           |
-| Dissolved Oxygen  | mg/ Liter                      | Numeric                    |
-| Phosophorus       | micrograms                     | Numeric                    |
+| Lake Name             | Name Factor                   | Character/ Factor          |
+| Depth                 | Meters below surface          | Numeric ; binary indicator |
+| Season                | Spring (May)/ Summer (August) | Binary indicator           |
+| Dissolved Oxygen (DO) | mg/ Liter                     | Numeric                    |
+| Phosphorus            | $\mu$g                        | Numeric                    |
+
+Our dependent variable is dissolved oxygen (mg/L) and our independent variables are total phosphorus ($\mu$g), season (May or August, coded as spring or summer), and depth (\<6 ft as surface, deeper than 6 ft as subsurface).
+
+In this report we use linear models to estimate dissolved oxygen across these lakes based on total phosphorus content sampled within the lakes' water columns. We examine the difference in the relationship of DO and total phosphorus in spring and summer, as well as the difference in the relationship of DO and total phosphorus at the water surface versus deeper in the water column. Finally, we use a hierarchical linear model to examine the DO and total phosphorus relationship across East Long, West Long, Peter, and Paul lakes.
+
+In order to check the assumptions of these models, we plot the residuals against a normal distribution (qq plot) as well as the residuals vs fitted values to check for constant variance. We also fit training models with 80% of the data and checked our mean absolute percentage error (MAPE) values to see the accuracy of our model fit versus our observed data.
 
 ```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
 
@@ -69,7 +97,9 @@ lake_1994 <- lakes_processed %>%
 
 ```
 
-## MODEL FIT ONE: Dissolved Oxygen by Total Phosphorus with a Seasonal Binary Indicator Variable and a Seasonal Interaction Term
+# Results
+
+## MODEL FIT ONE: Dissolved Oxygen (DO) by Total Phosphorus (TP) with a Seasonal Binary Indicator Variable and a Seasonal Interaction Term
 
 ```{r seasonal model, include=FALSE, message=FALSE, warning=FALSE}
 
@@ -83,28 +113,12 @@ summary(two_season_fit)
 
 ```
 
-a.  What is the estimate of $\beta_0$ and what does it represent in terms of DO (dissolved oxygen)?
-
-$\beta_0$ for this fit is 10.14 mg/L, which represents the expected value of DO in spring with zero total phosphorus.
-
-b.  What is the estimate of $\beta_1$ and what does it represent in terms of DO?
-
-$\beta_1$ for this fit is -2.36, which represents the difference in DO between spring and summer with zero total phosphorus. In summer the expected dissolved oxygen is 8.7 mg/L.
-
-c.  What is the estimate of $\beta_2$ and what does it represent in terms of DO?
-
-$\beta_2$ for this fit is -0.067 (mg/L)/ug, which represents the expected change in DO for each unit increase in total phosphorus during spring.
-
-d.  What is the estimate of $\beta_3$ and what does it represent in terms of DO?
-
-$\beta_3$ for this fit is 0.02 (mg/L)/ug, which represents the adjustment to the slope for each unit increase in total phosphorus during the summer. In the summer the expected change in DO for each unit increase in total phosphorus is -0.045 (mg/L)/ug.
-
-| Variable          | Value           | Interpretation                                                                     |
-|-------------------|-------------------|------------------------------------|
-| Beta0 (Intercept) | 10.14mg/L       | Expected value of DO in spring with 0tp                                            |
-| Beta1             | -2.36 mg/L      | Difference in DO between spring and summer with 0 tp                               |
-| Beta2             | -0.067 mg/L /ug | Expected change in D0 for each unit increase in tp in the spring                   |
-| Beta3             | 0.02 mg/L/ug    | Adjustment to slope for interaction for each unit increase in tp during the summer |
+| Variable              | Value                | Interpretation                                                                     |
+|-------------------|-------------------|----------------------------------|
+| $\beta_0$ (intercept) | 10.15 mg/L           | Expected value of DO in spring with 0 TP                                           |
+| $\beta_1$             | -2.36 mg/L           | Difference in DO between spring and summer with 0 TP                               |
+| $\beta_2$             | -0.067 (mg/L)/$\mu$g | Expected change in D0 for each unit increase in TP in the spring                   |
+| $\beta_3$             | 0.02 (mg/L)/$\mu$g   | Adjustment to slope for interaction for each unit increase in TP during the summer |
 
 ```{r seasonal model holdout and MAPE calculation, include = FALSE, message=FALSE, warning=FALSE}
 
@@ -119,10 +133,10 @@ two_season_fit_test <- lm(dissolvedOxygen ~ summer_indicator + tp_ug + summer_in
 
 print(two_season_fit_test)
 
-two_season_fit_test_beta_0 <- 10.33176
-two_season_fit_test_beta_1 <- -2.54724
-two_season_fit_test_beta_2 <- -0.07045
-two_season_fit_test_beta_3 <- 0.02518
+two_season_fit_test_beta_0 <- coef(two_season_fit)[1]
+two_season_fit_test_beta_1 <- coef(two_season_fit)[2]
+two_season_fit_test_beta_2 <- coef(two_season_fit)[3]
+two_season_fit_test_beta_3 <- coef(two_season_fit)[4]
 
 two_season_testing$do_predicted <- two_season_fit_test_beta_0 + 
     two_season_fit_test_beta_1*two_season_testing$summer_indicator +
@@ -158,24 +172,20 @@ ggplot(two_season_clean, aes(x=tp_ug, y=dissolvedOxygen, color=season))+
 ```
 
 ```{r seasonal model residuals, include = FALSE, message=FALSE, warning=FALSE}
-
 plot(two_season_fit)
-
 ```
 
-\*\*discuss the poor model fit in results and talk about how we attempted to log transform the x axis and tried to use a subset of the y axis dissolved oxygen, but we still didn't see normal distribution of residuals or constant variance of residuals. reference the plots but include them in the appendix.
+### Results Model One
 
-## Results Model One
+The results of this model are that the expected value of dissolved oxygen across all of the lakes with no phosphorus is 10.15 mg/L in the spring. In the summer, dissolved oxygen levels when there is no phosphorus decrease by 2.36 mg/L.
 
-The results of this model are that the expected value of dissolved oxygen across all of the lakes with no phosphorus is 10.22 mg/L in the spring. In the summer, dissolved oxygen levels when there is phosphorus decrease by 1.52 mg/L.
+The expected change in DO for each unit increase in total phosphorus during the spring is -0.067 (mg/L)/$\mu$g . In the summer this change increases by 0.02.
 
-The expected change in DO for each unit increase in total phosphorus during the spring is -0.063 mg/L/ug. In the summer this change increases by 0.02.
+These model results are displayed with the observed data in Figure 1. This linear model assumes that the residuals are normally distributed and have constant variance. The plots that examine these assumptions are found in the appendix plot 1. They show that these assumptions were not met, as the residuals do not follow a normal distribution (as seen in the qq plot), and the variance is not constant (in the residuals v fitted plot).
 
-These modeled results are displayed with the observed data in [figure \_\_]. These linear models assume that the residuals are normally distributed and have constant variance. The plots that test this are in the appendix, [figures \_\_ and \_\_\_]. These assumptions were not met, as the residuals do not follow a normal distribution (as seen in the qq plot), and the variance is not constant.
+We tried to improve our model by normalizing the data with a log transformation of total phosphorus. The results of this are in the appendix (Appendix plot log-transform). We still did not see normal distribution of residuals or constant variance of residuals. Additionally, we tried to use a subset of the DO data and fit our model to those data (Appendix plot subset DO), but still did not have promising results for our model assumptions. We chose to go forward with the original data because it is the most interpretable.
 
-We tried to improve our model by normalizing the data with a log transformation of total phosphorus. The results of this are in appendix [figure \_\_]. We still did not see normal distribution of residuals or constant variance of residuals. Additionally, we tried to use a subset of the DO data and fit our model to those data [appendix \_\_\_], but still did not have promising results. We chose to go forward with the original data because it is the most interpretable.
-
-These results show that with increasing concentrations of phosphorus, there is a decrease in dissolved oxygen, and that the impact of phosphorus on DO levels is slightly stronger in the summer. These results are significant (all of the p-values are less than 0.05 for each coefficient), but that doesn't mean they are the best model of these data. The MAPE score of 2.92 shows that there is high error when you compare the fitted and observed data.
+These results show that with increasing concentrations of phosphorus, there is a decrease in dissolved oxygen, and that the impact of phosphorus on DO levels is slightly stronger in the spring. These results are significant (all of the p-values are less than 0.05 for each coefficient), but that doesn't mean they are the best model of these data. The MAPE score of 2.99 shows that there is high error when you compare the fitted and observed data.
 
 ## MODEL FIT TWO: Dissolved Oxygen by Total Phosphorus with a Water Depth Binary Indicator Variable and a Water Depth Interaction Term
 
@@ -209,12 +219,12 @@ d.  What is the estimate of $\beta_3$ and what does it represent in terms of DO?
 
 $\beta_3$ for this fit is -0.003 (mg/L)/ug, which represents the adjustment to the slope for each unit increase in total phosphorus in subsurface water.
 
-| Variable          | Value       | Interpretation                                                          |
-|-------------------|-------------------|------------------------------------|
-| Beta0 (Intercept) | 8.52 mg/L   | Expected value of DO in surface water with 0tp                          |
-| Beta1             | -7.67 mg/L  | Difference in DO b/w sub- and surface water with 0 tp                   |
-| Beta2             | -.0002 mg/L | Expected change in D0 for each unit increase in tp in surface water     |
-| Beta3             | -0.003 mg/L | Adjustment to slope for interaction term between tp in subsurface water |
+| Variable              | Value       | Interpretation                                                          |
+|-------------------|-------------------|----------------------------------|
+| $\beta_0$ (Intercept) | 8.52 mg/L   | Expected value of DO in surface water with 0tp                          |
+| $\beta_1$             | -7.67 mg/L  | Difference in DO b/w sub- and surface water with 0 tp                   |
+| $\beta_2$             | -.0002 mg/L | Expected change in D0 for each unit increase in tp in surface water     |
+| $\beta_3$             | -0.003 mg/L | Adjustment to slope for interaction term between tp in subsurface water |
 
 ```{r depth model holdout and MAPE calculation, include = FALSE, message=FALSE, warning=FALSE}
 
@@ -300,10 +310,10 @@ b.  $\beta_1$ (tp_ug): -0.055 mg/L
 
 This represents the change in dissolved oxygen for each unit increase in total phosphorus in surface water.
 
-| Variable          | Value      | Interpretation                                          |
-|-------------------|-------------------|------------------------------------|
-| Beta0 (Intercept) | 8.68 mg/L  | Expected value of D0 with zero phosphorus               |
-| Beta1 (tp_ug)     | -0.55 mg/L | Change in dissolved oxygen for each unit increase in tp |
+| Variable              | Value               | Interpretation                                          |
+|-------------------|-------------------|----------------------------------|
+| $\beta_0$ (Intercept) | 8.68 mg/L           | Expected value of D0 with zero phosphorus               |
+| $\beta_1$ (tp_ug)     | -0.55 (mg/L)/$\mu$g | Change in dissolved oxygen for each unit increase in TP |
 
 ```{r hierarchical model holdout and MAPE calculation, include = FALSE, message=FALSE, warning=FALSE}
 
@@ -365,13 +375,13 @@ random_effects_plot <- data.frame(lakename = rownames(random_effects), random_ef
 
 ```
 
-## Model Three Results
+### Model Three Results
 
 This model evaluates dissolved oxygen (dependent) based upon total phosphorus (independent) in each lake in our subset. The hierarchical model evaluates these two variables, with consideration that each lake may have introduce differences in the relationship between the two, whose impacts should not be reflected in the pure randomness between the two variables but can be generalized between all lakes. Like the previous two models, linearity is assumed in the data, along with independence due to the nature of the data collection process. Normality of residuals and homoscedasticity are assumptions made of successful models, however our diagnostic plots demonstrate that this does not
 
 Based on the full dataset, the fixed estimate for the total phosphorus in micrograms is approximately -0.056, and for the training dataset it is approximately -0.054. Given the fixed estimate based on the full dataset, this suggests that for every one-unit increase in total phosphorus, dissolved oxygen decreases by approximately 0.056 units.
 
-## Analysis and Conclusion
+# Analysis and Conclusion
 
 | Model                          | MAPE |
 |--------------------------------|------|
@@ -385,27 +395,27 @@ The depth model has the lowest MAPE value, indicating that this fit is the best 
 
 Scientific evidence demonstrates increases in phosphorus lead to decreases in dissolved oxygen due to eutrophication events in bodies of water. However, this data, along with our research, does not indicate an exact relationship. The two clusters of data may suggest that beyond a certain quantity of phosphorus, or perhaps after a threshold required for a eutrophication event, dissolved oxygen drops to near zero. Thus, while we were unable to uncover quality models to predict the outcome of the quantity of dissolved oxygen based upon our variables, we were able to see this slight negative relationship and critical quantity at which dissolved oxygen largely does not exist beyond near zero values at high quantities of phosophorus.
 
-## APPENDIX
+# APPENDIX
 
-# Model One Residuals
+### Model One Residuals
 
-```{r model one residuals, echo = FALSE, message=FALSE, warning=FALSE}
+```{r model one residuals, fig.cap = "Appendix plot 1", echo = FALSE, message=FALSE, warning=FALSE}
 
 plot(two_season_fit)
 
 ```
 
-# Model Two Residuals
+### Model Two Residuals
 
-```{r model two residuals, echo=FALSE, message=FALSE, warning=FALSE}
+```{r model two residuals, fig.cap = "Appendix plot 2", echo=FALSE, message=FALSE, warning=FALSE}
 
 plot(jenn_fit_p)
 
 ```
 
-# Model Three Residuals
+### Model Three Residuals
 
-```{r model three residuals, echo = FALSE, message=FALSE, warning=FALSE}
+```{r model three residuals,fig.cap = "Appendix plot 3", echo = FALSE, message=FALSE, warning=FALSE}
 
 # Residual Plot (Residuals vs Fitted)
 residuals <- resid(fit)
@@ -629,12 +639,12 @@ lakes_all_years <- left_join(lakes_all_years,
                              select(do_raw, lakename, sampledate, depth, dissolvedOxygen), 
                              by = c("lakename", "sampledate", "depth"))
 
-lakes_all_years <- lakes_all_years %>%
+lakes_all_years_DO_subset <- lakes_all_years %>%
   filter(dissolvedOxygen <= 5)
 
 ```
 
-```{r log transformation, echo=FALSE, message=FALSE, warning=FALSE}
+```{r log transformation, fig.cap = "Appendix plot log-transform", echo=FALSE, message=FALSE, warning=FALSE}
 
 two_season_fit_log <- lm(dissolvedOxygen ~ summer_indicator + log(tp_ug) +
                            summer_indicator*tp_ug, data = two_season_clean)
@@ -651,6 +661,32 @@ ggplot(two_season_clean, aes(x=log(tp_ug), y=dissolvedOxygen, color=season))+
   #scale_x_continuous(breaks = seq(0, 300, by = 50))+
   #scale_y_continuous(breaks = seq(0, 15, by = 5))+
   xlab(expression("Log Transformed Total Phosphorus" ~ (µg)))+
+  ylab("dissolved oxygen (mg/L)")+
+  theme_light()+
+  theme(legend.position="right")+
+  labs(color = "Season")
+
+```
+
+```{r DO less than 5, fig.cap = "Appendix plot subset DO", echo=FALSE, message=FALSE, warning=FALSE}
+lakes_all_years_DO_subset_clean <- lakes_all_years_DO_subset %>% 
+  na.omit()
+
+two_season_fit_subset <- lm(dissolvedOxygen ~ summer_indicator + tp_ug +
+                           summer_indicator*tp_ug, data = lakes_all_years_DO_subset_clean)
+
+ggplot(lakes_all_years_DO_subset_clean, aes(x=tp_ug, y=dissolvedOxygen, color=season))+
+  geom_point()+
+  geom_abline(intercept = coef(two_season_fit_subset)[1],
+               slope = coef(two_season_fit_subset)[3],
+               color = "thistle3", size = 1)+
+   geom_abline(intercept = coef(two_season_fit_subset)[1] + coef(two_season_fit_subset)[2],
+               slope = coef(two_season_fit_subset)[3] + coef(two_season_fit_subset)[4],
+               color = "darkgoldenrod1", size = 1)+
+  scale_color_manual(values = c("spring" = "thistle3", "summer" = "darkgoldenrod1"))+
+  #scale_x_continuous(breaks = seq(0, 300, by = 50))+
+  #scale_y_continuous(breaks = seq(0, 15, by = 5))+
+  xlab(expression("Total Phosphorus" ~ (µg)))+
   ylab("dissolved oxygen (mg/L)")+
   theme_light()+
   theme(legend.position="right")+
