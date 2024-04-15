@@ -54,7 +54,7 @@ Our initial data exploration of the range and measures of central tendency of ea
 |------------------------------|-------|--------|----------------|
 | Total Phosphorus ($\mu$g)    | 34.91 | 19.47  | -3.04 - 284.03 |
 | Depth (Meters below surface) | 3.67  | 2      | 0 - 12         |
-| Dissolved Oxygen (mg/Liter)  | 5.96  | 7      | 0 - 17.3       |
+| Dissolved Oxygen (mg/Liter)  | 6.76  | 7.8    | 0 - 20       |
 
 : Measures of central tendency
 
@@ -148,7 +148,7 @@ summary(two_season_fit)
 ```
 
 | Variable              | Value                | Interpretation                                                                     |
-|----------------|----------------|-----------------------------------------|
+|------------------|------------------|-------------------------------------|
 | $\beta_0$ (intercept) | 10.15 mg/L           | Expected value of DO in spring with 0 TP                                           |
 | $\beta_1$             | -2.36 mg/L           | Difference in DO between spring and summer with 0 TP                               |
 | $\beta_2$             | -0.067 (mg/L)/$\mu$g | Expected change in DO for each unit increase in TP in the spring                   |
@@ -241,14 +241,14 @@ print(jenn_fit_p)
 
 ```
 
-Table: Model 2 coefficients 
+| Variable              | Value        | Interpretation                                                          |
+|-----------------|-----------------|--------------------------------------|
+| $\beta_0$ (Intercept) | 8.52 mg/L    | Expected value of DO in surface water with 0 TP                         |
+| $\beta_1$             | -7.67 mg/L   | Difference in DO between subsurface and surface water with 0 TP         |
+| $\beta_2$             | -0.0002 mg/L | Expected change in DO for each unit increase in TP in surface water     |
+| $\beta_3$             | -0.003 mg/L  | Adjustment to slope for interaction term between TP in subsurface water |
 
-| Variable             | Value          | Interpretation                                              |
-|----------------------|----------------|-------------------------------------------------------------|
-| $\beta_0$ (Intercept)| 8.52 mg/L      | Expected value of DO in surface water with 0 TP             |
-| $\beta_1$            | -7.67 mg/L     | Difference in DO between subsurface and surface water with 0 TP |
-| $\beta_2$            | -0.0002 mg/L   | Expected change in DO for each unit increase in TP in surface water |
-| $\beta_3$            | -0.003 mg/L    | Adjustment to slope for interaction term between TP in subsurface water |
+: Model 2 coefficients
 
 ------------------------------------------------------------------------
 
@@ -337,12 +337,12 @@ random_effects <- fit@u
 
 ```
 
-Table: Model 3 coefficients 
+| Variable              | Value               | Interpretation                                          |
+|-----------------|-----------------|--------------------------------------|
+| $\beta_0$ (Intercept) | 8.68 mg/L           | Expected value of DO with zero phosphorus               |
+| $\beta_1$ (tp_ug)     | -0.55 (mg/L)/$\mu$g | Change in dissolved oxygen for each unit increase in TP |
 
-| Variable             | Value           | Interpretation                                              |
-|----------------------|-----------------|-------------------------------------------------------------|
-| $\beta_0$ (Intercept)| 8.68 mg/L       | Expected value of DO with zero phosphorus                   |
-| $\beta_1$ (tp_ug)    | -0.55 (mg/L)/$\mu$g | Change in dissolved oxygen for each unit increase in TP   |
+: Model 3 coefficients
 
 ------------------------------------------------------------------------
 
@@ -406,6 +406,22 @@ random_effects_plot <- data.frame(lakename = rownames(random_effects), random_ef
 
 ```
 
+```{r}
+# Define the t value
+t_value_tp_ug <- -25.64
+
+# Calculate the degrees of freedom (df) for the t distribution
+df <- nrow(lakes_processed) - length(fixef(fit))
+
+# Calculate the two-tailed p-value
+p_value_tp_ug <- 2 * pt(abs(t_value_tp_ug), df = df, lower.tail = FALSE)
+
+# Print the p-value
+print(p_value_tp_ug)
+
+```
+
+
 ### Results Model Three
 
 This model evaluates dissolved oxygen (dependent) based upon total phosphorus (independent) in each lake in our subset. The hierarchical model evaluates these two variables, with consideration that each lake may introduce differences in the relationship between the two, whose impacts should not be reflected in the pure randomness between the two variables but can be generalized between all lakes. Figure 3 shows a graphical representation of this model. Like the previous two models, linearity is assumed in the data, along with independence due to the nature of the data collection process. Normality of residuals and homoscedasticity are assumptions made of successful models, however our diagnostic plots demonstrate that these assumptions were not met.
@@ -414,21 +430,21 @@ Based on the full dataset, the fixed estimate for the total phosphorus in microg
 
 The model's assumptions regarding linearity and independence hold, as expected based on the nature of the hierarchical model. However, the diagnostic plots reveal departures from normality of residuals and homoscedasticity, suggesting that the model may not fully capture all nuances in the data. Despite these limitations, the model provides valuable insights into the relationship between total phosphorus and dissolved oxygen, accounting for lake-specific effects that might otherwise confound the analysis.
 
-In terms of model performance, the Root Mean Squared Error (RMSE) score of 3.32 indicates a fairly high degree of error when comparing the fitted values to the observed data. This suggests that while the model may provides useful estimates, there is muhch room for improvement in capturing the variability in dissolved oxygen explained by total phosphorus across different lakes. Further refinements or alternative modeling approaches may be warranted to enhance predictive accuracy and better account for the complexities in the data.
+In terms of model performance, the Root Mean Squared Error (RMSE) score of 3.32 indicates a fairly high degree of error when comparing the fitted values to the observed data. This suggests that while the model may provides useful estimates, there is much room for improvement in capturing the variability in dissolved oxygen explained by total phosphorus across different lakes. However, the hypothesis test does indicate a statistically significant relationship between total phosporus and dissolved oxygen. Further refinements or alternative modeling approaches may be warranted to enhance predictive accuracy and better account for the complexities in the data.
 
 # Analysis and Conclusion
 
 Model Performance: To assess the effectiveness of our models in predicting dissolved oxygen (DO) levels based on total phosphorus (TP) concentrations, we evaluated three different models: Depth Model, Seasonal Model, and Hierarchical Model by Lakename. Each model's performance was measured using the Root Mean Squared Error (RMSE) metric, providing insights into the accuracy of predictions compared to observed data.
 
-Table: Model RMSE Comparission
+| Model                          | RMSE |
+|--------------------------------|------|
+| Depth Model                    | 2.42 |
+| Seasonal Model                 | 3.02 |
+| Hierarchical Model by Lakename | 3.31 |
 
-| Model                              | RMSE |
-|------------------------------------|------|
-| Depth Model                        | 2.42 |
-| Seasonal Model                     | 3.02 |
-| Hierarchical Model by Lakename     | 3.31 |
+: Model RMSE Comparission
 
-----
+------------------------------------------------------------------------
 
 The RMSE values indicate the percentage difference between predicted and observed DO values, with lower RMSE values indicating better model performance. Among the models evaluated, the Depth Model yielded the lowest RMSE, suggesting it provides the most accurate predictions compared to the other models evaluated
 
@@ -439,6 +455,12 @@ Despite the relatively lower RMSE of the Depth Model, all three models exhibited
 Hypothesis Testing Results
 
 Based on the hypothesis tests conducted for each model given the p-values of our statistical evaluations, all coefficients associated with TP were found to be statistically significant (p \< 0.05). This indicates a significant relationship between TP concentrations and DO levels across the lakes studied.
+
+| Model                          | Hypothesis Test Outcome|
+|--------------------------------|------|
+| Depth Model                    |  |
+| Seasonal Model                 | |
+| Hierarchical Model by Lakename | Reject Null B0 |
 
 Interpretation and Insights
 
