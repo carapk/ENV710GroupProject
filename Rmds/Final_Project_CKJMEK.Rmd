@@ -149,6 +149,8 @@ print(MAPE_seasonal)
 
 ```
 
+\newpage 
+
 ```{r seasonal model plot, fig.cap="Figure 1", echo=FALSE, message=FALSE}
 
 ggplot(two_season_clean, aes(x=tp_ug, y=dissolvedOxygen, color=season))+
@@ -170,6 +172,8 @@ ggplot(two_season_clean, aes(x=tp_ug, y=dissolvedOxygen, color=season))+
   labs(color = "Season")
 
 ```
+
+\newpage 
 
 ```{r seasonal model residuals, include = FALSE, message=FALSE, warning=FALSE}
 plot(two_season_fit)
@@ -255,6 +259,8 @@ print(MAPE_depth)
 
 ```
 
+\newpage 
+
 ```{r depth plot, fig.cap = "Figure 2", echo=FALSE, message=FALSE}
 
 #plot total phosphorus versus dissolved oxygen
@@ -277,6 +283,8 @@ ggplot(jenn, aes(x=tp_ug, y=dissolvedOxygen, color=subsurface))+
   labs(color = "depth")
 
 ```
+
+\newpage 
 
 ```{r depth model residuals, include = FALSE, message=FALSE, warning=FALSE}
 
@@ -337,6 +345,8 @@ print(MAPE_hierarchical)
 
 ```
 
+\newpage 
+
 ```{r hierarchical plot, fig.cap = "Figure 3", echo=FALSE, message=FALSE}
 
 ggplot(lakes_processed, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) +
@@ -350,6 +360,8 @@ ggplot(lakes_processed, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) +
   theme(legend.position = "right")
 
 ```
+
+\newpage 
 
 ```{r hierarchical model residuals, include = FALSE, message=FALSE, warning=FALSE}
 
