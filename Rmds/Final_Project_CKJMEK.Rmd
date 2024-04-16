@@ -65,7 +65,7 @@ In this report we use linear models to estimate dissolved oxygen across these la
 In order to check the assumptions of these models, we plot the residuals against a normal distribution (qq plot) as well as the residuals vs fitted values to check for constant variance. We also fit training models with 80% of the data and checked our root mean squared error (RMSE) values to see the accuracy of our model fit versus our observed data.
 
 ```{r load packages, include=FALSE, message=FALSE, warning=FALSE}
-
+#importing packages
 library(readr)
 library(dplyr)
 library(ggplot2)
@@ -80,22 +80,30 @@ library(Matrix)
 ```
 
 ```{r import and wrangle data, include=FALSE, message=FALSE, warning=FALSE}
+# load the data
+lakes_raw <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",
+                      stringsAsFactors = TRUE) 
+do_raw <- read.csv("Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv",
+                   stringsAsFactors = TRUE)
 
-lakes_raw <- read.csv("./Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",stringsAsFactors = TRUE) 
-do_raw <- read.csv("Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv",stringsAsFactors = TRUE)
-
+#convert dates to date type
 lakes_raw$sampledate <- mdy(lakes_raw$sampledate)
 do_raw$sampledate <- mdy(do_raw$sampledate)
 
+#select desired columns for analysis based on which lakes have the most data, 
+#create our binary indicator variables
 lakes_processed <- lakes_raw %>%
   select(lakename, sampledate, depth, tn_ug, tp_ug, nh34, no23, po4) %>%
   na.omit() %>%
-  filter(lakename %in% c("Paul Lake", "West Long Lake", "Peter Lake", "East Long Lake")) %>%
+  filter(lakename %in% c("Paul Lake", "West Long Lake", "Peter Lake", 
+                         "East Long Lake")) %>%
   #filter(year(sampledate) >= 1994 & year(sampledate) <= 1999) %>%
   mutate(year = factor(year(sampledate)),
          month = factor(month(sampledate)),
          subsurface = factor(ifelse(depth > 6, "subsurface", "surface")),
-         season = factor(ifelse(month == 5, "spring", ifelse(month == 8, "summer", NA)))) %>%
+         season = factor(ifelse(month == 5,
+                                "spring", 
+                                ifelse(month == 8,  "summer", NA)))) %>%
   filter(month %in% c(5,6,7,8)) %>%
   mutate(depth = round(depth * 2) / 2)
 
@@ -105,10 +113,12 @@ lakes_processed$subsurface_indicator <-
 lakes_processed$summer_indicator <- 
   ifelse(lakes_processed$season == "summer", 1, 0)
 
+#join with dissolved oxygen data
 lakes_processed <- left_join(lakes_processed, 
-                             select(do_raw, lakename, sampledate, depth, dissolvedOxygen), 
+                             select(do_raw, lakename, sampledate, 
+                                    depth, dissolvedOxygen), 
                              by = c("lakename", "sampledate", "depth"))
-
+#select a single year
 lake_1994 <- lakes_processed %>% 
   filter(year %in% c(1994)) %>% 
   filter(po4<20) %>% 
@@ -136,7 +146,7 @@ range_DO <- range(na.omit(lakes_processed$dissolvedOxygen))
 ## MODEL FIT ONE: Dissolved Oxygen (DO) by Total Phosphorus (TP) with a Seasonal Binary Indicator Variable and a Seasonal Interaction Term
 
 ```{r seasonal model, include=FALSE, message=FALSE, warning=FALSE}
-
+#only selecting for spring and summer
 two_season_clean <- lakes_processed %>% 
   na.omit()
 
@@ -188,7 +198,7 @@ print(RMSE_seasonal)
 ```
 
 ```{r seasonal model plot, fig.cap="Dissolved Oxygen vs Total Phosphorus by Season", echo=FALSE, message=FALSE, warning=FALSE}
-
+#plot results of model one, DO v TP by season
 ggplot(two_season_clean, aes(x=tp_ug, y=dissolvedOxygen, color=season))+
   geom_point()+
   geom_abline(intercept = coef(two_season_fit)[1],
@@ -228,7 +238,7 @@ These results show that with increasing concentrations of phosphorus, there is a
 ## MODEL FIT TWO: Dissolved Oxygen (DO) by Total Phosphorus (TP) with a Water Depth Binary Indicator Variable and a Water Depth Interaction Term
 
 ```{r depth model, include = FALSE, message=FALSE, warning=FALSE}
-
+#fitting second model
 jenn <- lakes_processed
 
 jenn$subsurface_tp_ug = jenn$tp_ug * jenn$subsurface_indicator
@@ -373,7 +383,7 @@ print(RMSE_hierarchical)
 ```
 
 ```{r hierarchical plot, fig.cap = "Dissolved Oxygen vs Total Phosphorus by Lake", echo=FALSE, message=FALSE, warning=FALSE}
-
+#plotting DO v TP by lake
 ggplot(lakes_processed, aes(x = tp_ug, y = dissolvedOxygen, color = lakename)) +
   geom_point() +
   geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +  # Add a linear regression line
@@ -472,7 +482,9 @@ Our analysis suggests a negative relationship between TP concentrations and DO l
 
 The two clusters of data, one showing high DO and low TP and the other showing consistently low DO across a range of TP values, imply potential thresholds or critical points where TP concentrations drastically impact DO levels. Beyond these thresholds, DO levels may drop significantly, possibly indicating eutrophication events leading to near-zero DO levels.
 
-Limitations and Future Directions While our models provide valuable insights into the TP-DO relationship, several limitations exist. The non-normality of residuals and heteroscedasticity indicate that our models may not fully capture all nuances in the data. Future research could explore alternative modeling approaches or data transformations to improve model accuracy and address these limitations.
+Limitations and Future Directions 
+
+While our models provide valuable insights into the TP-DO relationship, several limitations exist. The non-normality of residuals and heteroscedasticity indicate that our models may not fully capture all nuances in the data. Future research could explore alternative modeling approaches or data transformations to improve model accuracy and address these limitations.
 
 Additionally, our study focused on TP as the sole predictor of DO levels. Including other variables such as temperature, pH, and nutrient concentrations could enhance the predictive power of our models and provide a more comprehensive understanding of factors influencing DO in lakes.
 
@@ -480,7 +492,7 @@ In conclusion, while our models demonstrate a negative relationship between TP c
 
 # Description of project roles
 
-Emma wrote the intro, methods, model 1 results, and fit model 1. Jenn wrangled the datasets for analysis, completed the testing/training of all models, wrote model 2 results, and fit model 2. Cara wrote the analysis and conclusion, model 3 results, and fit model 3. All group members contributed in fine-tuning the final submission.
+Emma wrote the intro, methods, model 1 results, fit model 1, and annotated the r script. Jenn wrangled the datasets for analysis, completed the testing/training of all models, wrote model 2 results, and fit model 2. Cara wrote the analysis and conclusion, model 3 results, and fit model 3. All group members contributed in fine-tuning the final submission and helped one-another out when necessary.
 
 # Bibliography
 
